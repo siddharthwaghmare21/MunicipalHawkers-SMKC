@@ -1,0 +1,15 @@
+- [/] Backend API Services
+  - [ ] Update `AppEntities.cs` (Hawker/License Rejection fields)
+  - [ ] Add `RejectHawkerDto` and `RejectLicenseDto`
+  - [ ] EF Migration (`AddRejectionFields`)
+  - [ ] Update `IHawkerService` & `HawkerService` with Reject logic & AuditLog
+  - [ ] Update `ILicenseService` & `LicenseService` with Reject logic & AuditLog
+  - [ ] Add `POST /api/hawkers/{id}/reject` endpoint
+  - [ ] Add `POST /api/licenses/{id}/reject` endpoint
+- [ ] Frontend Implementation
+  - [ ] Add `POST /api/hawkers/[id]/reject` proxy
+  - [ ] Add `POST /api/licenses/[id]/reject` proxy
+  - [ ] Update Hawker List to include Status filter
+  - [ ] Add "Reject" button & modal on Hawker View Page
+  - [ ] Update License List to include Status filter
+  - [ ] Add "Reject" button & modal on License View Page

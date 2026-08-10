@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+.next/
+out/
+build/
+.env*.local
+
+# .NET
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+
+# Environment
+.env
+.env.development
+.env.production
+
+# General
+.DS_Store
+Thumbs.db
