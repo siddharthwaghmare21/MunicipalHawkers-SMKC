@@ -6,8 +6,8 @@ import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { getCookie } from 'cookies-next';
 
-export default function EditLicensePage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function EditLicensePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
   const router = useRouter();
 
   const [formData, setFormData] = useState({

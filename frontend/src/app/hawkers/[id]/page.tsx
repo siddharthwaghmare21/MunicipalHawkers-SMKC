@@ -26,8 +26,8 @@ const HAWKER_FIELDS = [
   { name: 'partnerDependancy', label: 'Partner Dependancy' }
 ];
 
-export default async function ViewHawkerPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function ViewHawkerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   

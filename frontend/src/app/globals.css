@@ -1,6 +1,74 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-primary: #C0392B;
+  --color-brand-primary-dark: #962d22;
+  --color-brand-secondary: #D4AF37;
+  --color-brand-cta: #E74C3C;
+  --color-brand-cta-hover: #C0392B;
+  --color-brand-white: #FDFEFE;
+  --color-brand-gray-50: #F2F3F4;
+  --color-brand-gray-100: #E8EAEB;
+  --color-brand-gray-200: #CCD1D1;
+  --color-text-muted: #7B7D7D;
+  --color-text-body: #4a5568;
+  --color-text-heading: #2C3E50;
+  --color-brand-dark: #1a252f;
+  --color-surface: #FDFEFE;
+  --color-surface-soft: #F2F3F4;
+  --color-surface-border: #E8EAEB;
+}
+
+:root {
+  --brand-primary: #C0392B;
+  --brand-primary-dark: #962d22;
+  --brand-secondary: #D4AF37;
+  --brand-cta: #E74C3C;
+  --brand-cta-hover: #C0392B;
+  --color-white: #FDFEFE;
+  --color-gray-50: #F2F3F4;
+  --color-gray-100: #E8EAEB;
+  --color-gray-200: #CCD1D1;
+  --color-text-muted: #7B7D7D;
+  --color-text-body: #4a5568;
+  --color-heading: #2C3E50;
+  --color-dark: #1a252f;
+  --surface: #FDFEFE;
+  --surface-soft: #F2F3F4;
+  --surface-border: #E8EAEB;
+}
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  background-color: var(--surface-soft);
+  color: var(--color-text-body);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Fix Bootstrap overriding Next.js Links */
+a {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+/* Bootstrap margin fixes for Typography inside Flex */
+h1, h2, h3, h4, h5, h6, p {
+  margin-bottom: 0;
+}
+
+/* Custom dashboard classes to match SMKC ERP */
+.dash-breadcrumb {
+  @apply text-sm text-text-muted mb-4 flex items-center space-x-2;
+}
+
+.dash-dept-header {
+  @apply text-2xl font-bold text-text-heading mb-6;
+}
+
+.dash-filter-input {
+  @apply border border-surface-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none;
 }

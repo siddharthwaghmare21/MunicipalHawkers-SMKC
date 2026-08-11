@@ -17,43 +17,44 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-4">
-      <div className="flex items-center">
-        <button 
-          onClick={toggleSidebar}
-          className="p-2 mr-4 text-slate-500 hover:bg-slate-100 rounded-md md:hidden focus:outline-none"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        <Link href="/" className="flex items-center">
-          <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">
-            S
-          </div>
-          <div className="hidden md:block">
-            <h1 className="text-xl font-bold text-slate-900 leading-tight">MunicipalHawkers</h1>
-            <p className="text-xs text-slate-500">SMKC ERP System</p>
-          </div>
-        </Link>
-      </div>
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-surface-border z-40 flex flex-col shadow-sm">
+      <div className="flex-1 flex items-center justify-between px-4 w-full h-full">
+        <div className="flex items-center">
+          <button 
+            onClick={toggleSidebar}
+            className="p-3 mr-2 text-slate-500 hover:bg-surface-soft rounded-md md:hidden focus:outline-none"
+          >
+            <i className="bi bi-list text-2xl"></i>
+          </button>
+          <Link href="/" className="flex items-center !no-underline !text-slate-800">
+            <div className="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-bold text-xl mr-3 shadow-sm">
+              S
+            </div>
+            <div className="hidden md:block">
+              <h1 className="!text-xl font-bold !text-slate-800 leading-tight tracking-tight !m-0 !mb-0 !mt-0">MunicipalHawkers</h1>
+              <p className="!text-xs text-text-muted !m-0 !mb-0 !mt-0">SMKC ERP System</p>
+            </div>
+          </Link>
+        </div>
 
-      <div className="flex items-center space-x-4">
-        <button className="text-sm font-medium text-slate-600 hover:text-red-600">
-          En / Mr
-        </button>
-        <button 
-          onClick={handleLogout}
-          className="text-sm font-medium text-slate-600 hover:text-red-600 bg-slate-100 px-3 py-1 rounded-md transition-colors"
-        >
-          Logout
-        </button>
-        <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+        <div className="flex items-center gap-3 md:gap-6">
+          <button className="!text-sm font-medium !text-slate-600 hover:!text-brand-primary transition-colors px-1 py-1.5 flex items-center">
+            <span className="hidden sm:inline">En / Mr</span>
+            <span className="sm:hidden text-lg"><i className="bi bi-translate"></i></span>
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="!text-sm font-medium !text-red-600 hover:!text-red-700 bg-red-50 px-2 sm:px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 sm:gap-2 border border-red-200 hover:bg-red-100"
+          >
+            <i className="bi bi-box-arrow-right !text-red-600"></i>
+            <span className="hidden sm:inline !m-0 !p-0">Logout</span>
+          </button>
+          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center !text-slate-600 border border-slate-200 flex-shrink-0">
+            <i className="bi bi-person-fill"></i>
+          </div>
         </div>
       </div>
+      <div className="h-1 w-full bg-gradient-to-r from-[#C0392B] to-[#D4AF37]"></div>
     </header>
   );
 }

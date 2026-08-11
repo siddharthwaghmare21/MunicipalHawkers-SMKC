@@ -31,14 +31,19 @@ export default async function DashboardPage() {
     });
     
     if (res.ok) {
-      stats = await res.json();
+      const responseBody = await res.json();
+      if (responseBody.success) {
+        stats = responseBody.data;
+      } else {
+        console.error('API Error:', responseBody.message);
+      }
     }
   } catch (err) {
     console.error('Error fetching dashboard stats:', err);
   }
 
   const summaryCards = [
-    { title: 'Total Hawkers', value: stats.totalHawkers, color: 'border-blue-500' },
+    { title: 'Total Hawkers', value: stats.totalHawkers, color: 'border-brand-primary' },
     { title: 'Active Licenses', value: stats.activeLicenses, color: 'border-green-500' },
     { title: 'Pending Licenses', value: stats.pendingLicenses, color: 'border-amber-500' },
     { title: 'Rejected Hawkers', value: stats.rejectedHawkers, color: 'border-red-500' },
@@ -86,7 +91,7 @@ export default async function DashboardPage() {
                     </tr>
                   ) : stats.recentlyAddedHawkers.map((hawker: any, idx: number) => (
                     <tr key={idx} className="border-b border-slate-100">
-                      <td className="px-4 py-3 font-medium text-blue-600">
+                      <td className="px-4 py-3 font-medium text-brand-primary">
                          {hawker.enrollmentNo || `HWK-${hawker.id}`}
                       </td>
                       <td className="px-4 py-3 text-slate-800">{hawker.fullName}</td>
@@ -123,7 +128,7 @@ export default async function DashboardPage() {
                     </tr>
                   ) : stats.recentlyRenewedHawkers.map((renewal: any, idx: number) => (
                     <tr key={idx} className="border-b border-slate-100">
-                      <td className="px-4 py-3 font-medium text-blue-600">{renewal.licenseNumber}</td>
+                      <td className="px-4 py-3 font-medium text-brand-primary">{renewal.licenseNumber}</td>
                       <td className="px-4 py-3 text-slate-800">{renewal.hawkerName}</td>
                       <td className="px-4 py-3 text-slate-600">{new Date(renewal.renewalDate).toLocaleDateString()}</td>
                       <td className="px-4 py-3 text-slate-600">{new Date(renewal.expiryDate).toLocaleDateString()}</td>
@@ -143,7 +148,7 @@ export default async function DashboardPage() {
                 Add New Hawker
               </Link>
               <Link href="/hawkers" className="flex items-center p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md transition-colors text-slate-700 font-medium text-sm">
-                <svg className="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <svg className="w-5 h-5 mr-3 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 View Hawkers
               </Link>
               <Link href="/licenses?filter=renewals" className="flex items-center p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md transition-colors text-slate-700 font-medium text-sm">
@@ -161,3 +166,4 @@ export default async function DashboardPage() {
     </div>
   );
 }
+

@@ -86,7 +86,11 @@ export default function EditHawkerPage({ params }: { params: Promise<{ id: strin
         router.refresh();
       } else {
         const data = await res.json();
-        setError(data.error || 'Failed to update hawker');
+        if (data.errors) {
+            const errorMessages = Object.values(data.errors).flat().join(' ');
+            throw new Error(errorMessages);
+        }
+        throw new Error(data.message || 'Failed to update hawker');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
@@ -130,7 +134,7 @@ export default function EditHawkerPage({ params }: { params: Promise<{ id: strin
                       value={formData[field.name] || ''}
                       onChange={handleChange}
                       required={field.required}
-                      className="border border-slate-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
+                      className="border border-slate-300 rounded-md px-3 py-2.5 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
                     >
                       {field.options?.map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
@@ -143,25 +147,28 @@ export default function EditHawkerPage({ params }: { params: Promise<{ id: strin
                       value={formData[field.name] || ''}
                       onChange={handleChange}
                       required={field.required}
-                      className="border border-slate-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
+                      pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : field.name === 'enrollmentNo' ? '^SMKC-.*' : undefined}
+                      title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : field.name === 'enrollmentNo' ? "Enrollment Number must start with 'SMKC-'" : undefined}
+                      max={field.type === 'date' ? new Date().toISOString().split('T')[0] : undefined}
+                      className="border border-slate-300 rounded-md px-3 py-2.5 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
                     />
                   )}
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => router.push('/hawkers')}
-                className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors text-sm font-medium"
+                className="px-4 py-2.5 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors text-sm font-medium w-full sm:w-auto text-center"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+                className="bg-blue-600 text-white px-4 py-2.5 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50 w-full sm:w-auto text-center"
               >
                 {saving ? 'Saving...' : 'Update Hawker'}
               </button>

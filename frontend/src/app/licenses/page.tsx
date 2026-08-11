@@ -5,16 +5,15 @@ import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { Badge } from '@/components/Badge';
 
-export default async function LicensesPage({
-  searchParams,
-}: {
-  searchParams: { page?: string; search?: string; status?: string };
+export default async function LicensesPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const searchParams = await props.searchParams;
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
-  const page = searchParams.page || '1';
-  const search = searchParams.search || '';
-  const status = searchParams.status || '';
+  const page = (searchParams.page as string) || '1';
+  const search = (searchParams.search as string) || '';
+  const status = (searchParams.status as string) || '';
 
   const queryParams = new URLSearchParams({
     page,
@@ -69,7 +68,7 @@ export default async function LicensesPage({
         <h1 className="text-2xl font-bold text-slate-800">License Management</h1>
         <Link 
           href="/licenses/add" 
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
+          className="bg-brand-primary text-white px-4 py-2 rounded-md hover:bg-brand-primary-dark transition-colors text-sm font-medium shadow-sm"
         >
           Issue New License
         </Link>
@@ -81,7 +80,7 @@ export default async function LicensesPage({
         </div>
       ) : (
         <Card>
-          <div className="flex flex-col md:flex-row justify-between mb-4 space-y-3 md:space-y-0">
+          <div className="flex flex-col md:flex-row justify-between mb-4 space-y-3 md:space-y-0 gap-2">
             <form className="relative w-full md:w-64" method="GET">
               <input 
                 type="hidden"
@@ -93,19 +92,19 @@ export default async function LicensesPage({
                 name="search"
                 defaultValue={search}
                 placeholder="Search licenses..." 
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:border-brand-primary text-sm outline-none"
               />
               <button type="submit" className="absolute left-3 top-2.5">
                 <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </button>
             </form>
-            <div className="flex space-x-2">
-              <form method="GET" className="flex space-x-2">
+            <div className="w-full md:w-auto">
+              <form method="GET" className="flex flex-col sm:flex-row gap-2">
                 <input type="hidden" name="search" value={search} />
                 <select 
                   name="status" 
                   defaultValue={status} 
-                  className="border border-slate-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
+                  className="w-full sm:w-auto border border-slate-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none text-slate-700"
                 >
                   <option value="">All Statuses</option>
                   <option value="Active">Active</option>
@@ -119,7 +118,7 @@ export default async function LicensesPage({
               </form>
             </div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto w-full">
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
                 <tr>
@@ -136,7 +135,7 @@ export default async function LicensesPage({
                 {licenses.length > 0 ? (
                   licenses.map((lic: any, idx: number) => (
                     <tr key={lic.id || idx} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="px-4 py-3 font-medium text-blue-600">{lic.licenseNumber}</td>
+                      <td className="px-4 py-3 font-medium text-brand-primary">{lic.licenseNumber}</td>
                       <td className="px-4 py-3 text-slate-800">{lic.licenseType}</td>
                       <td className="px-4 py-3 text-slate-800">{lic.hawkerId}</td>
                       <td className="px-4 py-3 text-slate-600">
@@ -151,8 +150,8 @@ export default async function LicensesPage({
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-right space-x-3">
-                        <Link href={`/licenses/${lic.id}`} className="text-blue-600 hover:text-blue-800 font-medium text-sm">View</Link>
-                        <Link href={`/licenses/${lic.id}/edit`} className="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit</Link>
+                        <Link href={`/licenses/${lic.id}`} className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm">View</Link>
+                        <Link href={`/licenses/${lic.id}/edit`} className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm">Edit</Link>
                       </td>
                     </tr>
                   ))
@@ -167,7 +166,7 @@ export default async function LicensesPage({
             </table>
           </div>
           {totalCount > 0 && (
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
               <span className="text-sm text-slate-500">Showing {(parseInt(page) - 1) * 10 + 1} to {Math.min(parseInt(page) * 10, totalCount)} of {totalCount} entries</span>
               <div className="flex space-x-1">
                 <Link 
@@ -193,3 +192,4 @@ export default async function LicensesPage({
     </div>
   );
 }
+

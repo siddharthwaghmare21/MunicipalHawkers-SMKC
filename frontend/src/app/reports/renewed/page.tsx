@@ -170,7 +170,7 @@ export default function RenewedHawkersReportPage() {
                 placeholder="Search..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm px-4 py-2 border"
               />
             </div>
             
@@ -180,7 +180,7 @@ export default function RenewedHawkersReportPage() {
                 type="date" 
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm px-4 py-2 border"
               />
             </div>
 
@@ -190,7 +190,7 @@ export default function RenewedHawkersReportPage() {
                 type="date" 
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm px-4 py-2 border"
               />
             </div>
 
@@ -199,7 +199,7 @@ export default function RenewedHawkersReportPage() {
               <select
                 value={businessType}
                 onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border bg-white"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm px-4 py-2 border bg-white"
               >
                 <option value="">All Types</option>
                 <option value="Food">Food</option>
@@ -210,7 +210,7 @@ export default function RenewedHawkersReportPage() {
               </select>
             </div>
 
-            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 h-[38px]">
+            <button type="submit" className="bg-brand-primary text-white px-6 py-2 rounded-md hover:bg-brand-primary-dark h-[38px]">
               Apply Filters
             </button>
           </form>
@@ -219,7 +219,7 @@ export default function RenewedHawkersReportPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto print:overflow-visible">
+        <div className="overflow-x-auto w-full print:overflow-visible">
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 print:bg-transparent">
               <tr>
@@ -260,7 +260,7 @@ export default function RenewedHawkersReportPage() {
 
         {/* Pagination - hidden in print mode */}
         {!loading && totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between print:hidden">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 print:hidden">
             <div className="text-sm text-slate-500">
               Page {page} of {totalPages}
             </div>
@@ -286,3 +286,4 @@ export default function RenewedHawkersReportPage() {
     </div>
   );
 }
+

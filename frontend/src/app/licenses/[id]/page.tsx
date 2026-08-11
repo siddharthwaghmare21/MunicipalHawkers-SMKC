@@ -6,8 +6,8 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { Badge } from '@/components/Badge';
 import { RejectButton } from '@/components/RejectButton';
 
-export default async function ViewLicensePage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function ViewLicensePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   

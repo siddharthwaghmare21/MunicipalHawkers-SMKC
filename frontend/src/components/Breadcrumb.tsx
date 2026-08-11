@@ -26,7 +26,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
               {isLast || !item.href ? (
                 <span className="text-slate-700 font-medium">{item.label}</span>
               ) : (
-                <Link href={item.href} className="hover:text-blue-600">
+                <Link href={item.href} className="hover:text-brand-primary">
                   {item.label}
                 </Link>
               )}
@@ -37,3 +37,4 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
     </nav>
   );
 }
+

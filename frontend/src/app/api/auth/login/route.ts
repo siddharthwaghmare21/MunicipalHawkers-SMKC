@@ -23,8 +23,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: errorData.message || 'Invalid credentials' }, { status: 401 });
     }
 
-    const data = await backendRes.json();
-    const token = data.token;
+    const responseData = await backendRes.json();
+    const token = responseData.data?.token || responseData.token;
     
     if (!token) {
         return NextResponse.json({ error: 'Invalid response from server' }, { status: 500 });
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 2 // 2 hours
     });
 
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(responseData, { status: 200 });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

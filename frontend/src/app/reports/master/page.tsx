@@ -181,9 +181,9 @@ export default function MasterHawkerReportPage() {
               placeholder="Search by Enrollment No or Name..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 rounded-l-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border"
+              className="flex-1 rounded-l-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm px-4 py-2 border"
             />
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700">
+            <button type="submit" className="bg-brand-primary text-white px-4 py-2 rounded-r-md hover:bg-brand-primary-dark">
               Search
             </button>
           </form>
@@ -192,7 +192,7 @@ export default function MasterHawkerReportPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto print:overflow-visible">
+        <div className="overflow-x-auto w-full print:overflow-visible">
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 print:bg-transparent">
               <tr>
@@ -235,7 +235,7 @@ export default function MasterHawkerReportPage() {
                   <td className="px-4 py-3">
                     {item.licenseNumber ? (
                       <>
-                        <div className="font-medium text-blue-600">{item.licenseNumber}</div>
+                        <div className="font-medium text-brand-primary">{item.licenseNumber}</div>
                         <div className="text-xs text-slate-500">
                            Exp: {item.licenseExpiryDate ? new Date(item.licenseExpiryDate).toLocaleDateString() : '-'}
                         </div>
@@ -257,7 +257,7 @@ export default function MasterHawkerReportPage() {
 
         {/* Pagination - hidden in print mode */}
         {!loading && totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between print:hidden">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 print:hidden">
             <div className="text-sm text-slate-500">
               Page {page} of {totalPages}
             </div>
@@ -283,3 +283,4 @@ export default function MasterHawkerReportPage() {
     </div>
   );
 }
+

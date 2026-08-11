@@ -21,7 +21,7 @@ export default function DocumentsPage() {
       </div>
 
       <Card>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto w-full">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
               <tr>
@@ -43,7 +43,7 @@ export default function DocumentsPage() {
                   <td className="px-4 py-3 text-slate-600">{doc.size}</td>
                   <td className="px-4 py-3 text-slate-600">{doc.date}</td>
                   <td className="px-4 py-3 text-right">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium text-sm mr-3">Download</button>
+                    <button className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm mr-3">Download</button>
                   </td>
                 </tr>
               ))}
@@ -54,3 +54,4 @@ export default function DocumentsPage() {
     </div>
   );
 }
+

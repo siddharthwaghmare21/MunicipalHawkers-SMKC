@@ -15,12 +15,11 @@ interface AuditLog {
   timestamp: string;
 }
 
-export default async function AuditLogsPage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
+export default async function AuditLogsPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const page = parseInt(searchParams.page || '1');
+  const searchParams = await props.searchParams;
+  const page = parseInt((searchParams.page as string) || '1');
   const pageSize = 15;
   
   const cookieStore = await cookies();
@@ -98,7 +97,7 @@ export default async function AuditLogsPage({
                       {log.username || 'System'} {log.userId && <span className="text-xs text-slate-400 font-normal ml-1">(ID: {log.userId})</span>}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-brand-primary-dark">
                         {log.action}
                       </span>
                     </td>
@@ -141,3 +140,4 @@ export default async function AuditLogsPage({
     </div>
   );
 }
+

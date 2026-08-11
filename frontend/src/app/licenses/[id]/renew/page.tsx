@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
 
-export default function RenewLicensePage({ params }: { params: { id: string } }) {
+export default function RenewLicensePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { id } = params;
+  const { id } = React.use(params);
 
   const [license, setLicense] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +69,11 @@ export default function RenewLicensePage({ params }: { params: { id: string } })
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to renew license');
+        if (errorData.errors) {
+            const errorMessages = Object.values(errorData.errors).flat().join(' ');
+            throw new Error(errorMessages);
+        }
+        throw new Error(errorData.message || errorData.error || 'Failed to renew license');
       }
 
       router.push(`/licenses/${id}`);
@@ -134,7 +138,7 @@ export default function RenewLicensePage({ params }: { params: { id: string } })
               <input
                 type="date"
                 required
-                className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
               />
@@ -143,7 +147,7 @@ export default function RenewLicensePage({ params }: { params: { id: string } })
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">License Type</label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 value={licenseType}
                 onChange={(e) => setLicenseType(e.target.value)}
               >
@@ -156,7 +160,7 @@ export default function RenewLicensePage({ params }: { params: { id: string } })
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">Status</label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -173,24 +177,24 @@ export default function RenewLicensePage({ params }: { params: { id: string } })
             <label className="block text-sm font-medium text-slate-700">Remarks</label>
             <textarea
               rows={3}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="Add any remarks for this renewal..."
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={() => router.push(`/licenses/${id}`)}
-              className="px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none"
+              className="px-4 py-2.5 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none w-full sm:w-auto text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+              className="px-4 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none w-full sm:w-auto text-center"
             >
               Confirm Renewal
             </button>

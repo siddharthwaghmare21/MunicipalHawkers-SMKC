@@ -88,7 +88,7 @@ export default function AddLicensePage() {
                 value={formData.licenseNumber}
                 onChange={handleChange}
                 required
-                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary"
               />
             </div>
 
@@ -99,7 +99,7 @@ export default function AddLicensePage() {
                 value={formData.licenseType}
                 onChange={handleChange}
                 required
-                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary"
               >
                 <option value="Food">Food</option>
                 <option value="Merchandise">Merchandise</option>
@@ -114,7 +114,7 @@ export default function AddLicensePage() {
                 value={formData.status}
                 onChange={handleChange}
                 required
-                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary"
               >
                 <option value="Pending">Pending</option>
                 <option value="Active">Active</option>
@@ -133,7 +133,7 @@ export default function AddLicensePage() {
                 value={formData.issueDate}
                 onChange={handleChange}
                 required
-                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary"
               />
             </div>
 
@@ -144,7 +144,7 @@ export default function AddLicensePage() {
                 name="expiryDate"
                 value={formData.expiryDate}
                 onChange={handleChange}
-                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary"
               />
             </div>
             
@@ -167,7 +167,7 @@ export default function AddLicensePage() {
                 value={formData.remarks}
                 onChange={handleChange}
                 rows={3}
-                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary"
               ></textarea>
             </div>
 
@@ -184,7 +184,7 @@ export default function AddLicensePage() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 shadow-sm"
+              className="bg-brand-primary text-white px-4 py-2 rounded-md hover:bg-brand-primary-dark transition-colors text-sm font-medium disabled:opacity-50 shadow-sm"
             >
               {loading ? 'Saving...' : 'Issue License'}
             </button>
@@ -194,3 +194,4 @@ export default function AddLicensePage() {
     </div>
   );
 }
+
