@@ -24,12 +24,7 @@ namespace backend.Controllers
             [FromQuery] int pageSize = 10)
         {
             var result = await _auditLogService.GetLogsAsync(page, pageSize);
-            return Ok(new ApiResponse<PaginatedResult<AuditLogDto>>
-            {
-                Success = true,
-                Message = "Audit logs retrieved successfully",
-                Data = result
-            });
+            return Ok(ApiResponse<PaginatedResult<AuditLogDto>>.Ok(result, "Audit logs retrieved successfully"));
         }
     }
 }

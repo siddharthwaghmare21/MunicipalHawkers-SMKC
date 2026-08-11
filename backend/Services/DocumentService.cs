@@ -62,7 +62,7 @@ namespace backend.Services
                 ContentType = uploadDto.File.ContentType,
                 FileSize = uploadDto.File.Length,
                 UploadDate = DateTime.UtcNow,
-                Status = "Pending"
+                Status = "UNDER_REVIEW"
             };
 
             _context.Documents.Add(document);

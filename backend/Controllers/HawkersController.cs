@@ -27,28 +27,23 @@ namespace backend.Controllers
             [FromQuery] int pageSize = 10)
         {
             var result = await _hawkerService.GetAllHawkersAsync(search, zone, status, page, pageSize);
-            return Ok(new ApiResponse<PaginatedResult<HawkerDto>>
-            {
-                Success = true,
-                Message = "Hawkers retrieved successfully",
-                Data = result
-            });
+            return Ok(ApiResponse<PaginatedResult<HawkerDto>>.Ok(result, "Hawkers retrieved successfully"));
         }
 
         [HttpGet("report/master")]
-        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN,CLERK")]
+        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN")]
         public async Task<IActionResult> GetMasterReport([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _hawkerService.GetMasterReportAsync(search, page, pageSize);
-            return Ok(result);
+            return Ok(ApiResponse<PaginatedResult<MasterHawkerReportDto>>.Ok(result));
         }
 
         [HttpGet("report/renewed")]
-        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN,CLERK")]
+        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN")]
         public async Task<IActionResult> GetRenewedHawkersReport([FromQuery] string? search, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] string? businessType, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _hawkerService.GetRenewedHawkersReportAsync(search, fromDate, toDate, businessType, page, pageSize);
-            return Ok(result);
+            return Ok(ApiResponse<PaginatedResult<RenewedHawkerReportDto>>.Ok(result));
         }
 
         [HttpGet("{id}")]
@@ -57,19 +52,10 @@ namespace backend.Controllers
             var hawker = await _hawkerService.GetHawkerByIdAsync(id);
             if (hawker == null)
             {
-                return NotFound(new ApiResponse<HawkerDto>
-                {
-                    Success = false,
-                    Message = $"Hawker with id {id} not found."
-                });
+                return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with id {id} not found."));
             }
 
-            return Ok(new ApiResponse<HawkerDto>
-            {
-                Success = true,
-                Message = "Hawker retrieved successfully",
-                Data = hawker
-            });
+            return Ok(ApiResponse<HawkerDto>.Ok(hawker, "Hawker retrieved successfully"));
         }
 
         [HttpPost]
@@ -79,12 +65,7 @@ namespace backend.Controllers
             int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
 
             var hawker = await _hawkerService.CreateHawkerAsync(dto, userId);
-            return CreatedAtAction(nameof(GetHawker), new { id = hawker.Id }, new ApiResponse<HawkerDto>
-            {
-                Success = true,
-                Message = "Hawker created successfully",
-                Data = hawker
-            });
+            return CreatedAtAction(nameof(GetHawker), new { id = hawker.Id }, ApiResponse<HawkerDto>.Ok(hawker, "Hawker created successfully"));
         }
 
         [HttpPut("{id}")]
@@ -96,19 +77,10 @@ namespace backend.Controllers
             var hawker = await _hawkerService.UpdateHawkerAsync(id, dto, userId);
             if (hawker == null)
             {
-                return NotFound(new ApiResponse<HawkerDto>
-                {
-                    Success = false,
-                    Message = $"Hawker with id {id} not found."
-                });
+                return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with id {id} not found."));
             }
 
-            return Ok(new ApiResponse<HawkerDto>
-            {
-                Success = true,
-                Message = "Hawker updated successfully",
-                Data = hawker
-            });
+            return Ok(ApiResponse<HawkerDto>.Ok(hawker, "Hawker updated successfully"));
         }
 
         [HttpPost("{id}/reject")]
@@ -122,27 +94,14 @@ namespace backend.Controllers
                 var hawker = await _hawkerService.RejectHawkerAsync(id, dto, userId);
                 if (hawker == null)
                 {
-                    return NotFound(new ApiResponse<HawkerDto>
-                    {
-                        Success = false,
-                        Message = $"Hawker with id {id} not found."
-                    });
+                    return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with id {id} not found."));
                 }
 
-                return Ok(new ApiResponse<HawkerDto>
-                {
-                    Success = true,
-                    Message = "Hawker rejected successfully",
-                    Data = hawker
-                });
+                return Ok(ApiResponse<HawkerDto>.Ok(hawker, "Hawker rejected successfully"));
             }
             catch (System.InvalidOperationException ex)
             {
-                return BadRequest(new ApiResponse<HawkerDto>
-                {
-                    Success = false,
-                    Message = ex.Message
-                });
+                return BadRequest(ApiResponse<HawkerDto>.Error(ex.Message));
             }
         }
     }

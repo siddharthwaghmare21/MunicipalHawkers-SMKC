@@ -31,11 +31,11 @@ namespace backend.Controllers
                     return Unauthorized("User ID not found in token");
                     
                 var result = await _documentService.UploadDocumentAsync(uploadDto, userId);
-                return Ok(result);
+                return Ok(ApiResponse<DocumentDto>.Ok(result, "Document uploaded successfully"));
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Error(ex.Message));
             }
         }
 
@@ -45,11 +45,11 @@ namespace backend.Controllers
             try
             {
                 var documents = await _documentService.GetDocumentsByHawkerIdAsync(hawkerId);
-                return Ok(documents);
+                return Ok(ApiResponse<IEnumerable<DocumentDto>>.Ok(documents, "Documents retrieved successfully"));
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Error(ex.Message));
             }
         }
 
@@ -63,7 +63,7 @@ namespace backend.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.Error(ex.Message));
             }
         }
 
@@ -74,11 +74,11 @@ namespace backend.Controllers
             try
             {
                 await _documentService.DeleteDocumentAsync(id);
-                return Ok(new { message = "Document deleted successfully" });
+                return Ok(ApiResponse<object>.Ok(null, "Document deleted successfully"));
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Error(ex.Message));
             }
         }
 
@@ -93,11 +93,11 @@ namespace backend.Controllers
                     return Unauthorized("User ID not found in token");
                     
                 var result = await _documentService.VerifyDocumentAsync(id, verifyDto, userId);
-                return Ok(result);
+                return Ok(ApiResponse<DocumentDto>.Ok(result, "Document verified successfully"));
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Error(ex.Message));
             }
         }
     }

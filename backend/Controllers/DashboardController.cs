@@ -22,7 +22,7 @@ namespace backend.Controllers
         public async Task<IActionResult> GetDashboardMetrics()
         {
             var stats = await _dashboardService.GetDashboardStatsAsync();
-            return Ok(stats);
+            return Ok(ApiResponse<DashboardDto>.Ok(stats, "Dashboard stats retrieved successfully"));
         }
     }
 }

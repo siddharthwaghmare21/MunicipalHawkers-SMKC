@@ -24,12 +24,7 @@ namespace backend.Controllers
         public async Task<ActionResult<ApiResponse<IEnumerable<LicenseRenewalDto>>>> GetRenewalsForLicense(int licenseId)
         {
             var renewals = await _renewalService.GetRenewalsForLicenseAsync(licenseId);
-            return Ok(new ApiResponse<IEnumerable<LicenseRenewalDto>>
-            {
-                Success = true,
-                Message = "Renewals retrieved successfully",
-                Data = renewals
-            });
+            return Ok(ApiResponse<IEnumerable<LicenseRenewalDto>>.Ok(renewals, "Renewals retrieved successfully"));
         }
 
         [HttpPost]
@@ -41,19 +36,10 @@ namespace backend.Controllers
             var result = await _renewalService.ProcessRenewalAsync(dto, userId);
             if (result == null)
             {
-                return NotFound(new ApiResponse<LicenseDto>
-                {
-                    Success = false,
-                    Message = "License not found."
-                });
+                return NotFound(ApiResponse<LicenseDto>.Error("License not found."));
             }
 
-            return Ok(new ApiResponse<LicenseDto>
-            {
-                Success = true,
-                Message = "License renewed successfully",
-                Data = result
-            });
+            return Ok(ApiResponse<LicenseDto>.Ok(result, "License renewed successfully"));
         }
     }
 }

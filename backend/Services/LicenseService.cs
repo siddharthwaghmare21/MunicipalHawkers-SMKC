@@ -62,6 +62,15 @@ namespace backend.Services
 
         public async Task<LicenseDto> CreateLicenseAsync(CreateLicenseDto dto, int? userId)
         {
+            if (dto.IssueDate > dto.ExpiryDate)
+                throw new System.InvalidOperationException("Issue Date cannot be after Expiry Date.");
+
+            if (!string.IsNullOrWhiteSpace(dto.LicenseNumber))
+            {
+                var existing = await _context.Licenses.FirstOrDefaultAsync(l => l.LicenseNumber == dto.LicenseNumber);
+                if (existing != null)
+                    throw new System.InvalidOperationException($"A license with License Number '{dto.LicenseNumber}' already exists.");
+            }
             var license = new License
             {
                 HawkerId = dto.HawkerId,
@@ -85,6 +94,16 @@ namespace backend.Services
 
         public async Task<LicenseDto?> UpdateLicenseAsync(int id, UpdateLicenseDto dto, int? userId)
         {
+            if (dto.IssueDate > dto.ExpiryDate)
+                throw new System.InvalidOperationException("Issue Date cannot be after Expiry Date.");
+
+            if (!string.IsNullOrWhiteSpace(dto.LicenseNumber))
+            {
+                var existing = await _context.Licenses.FirstOrDefaultAsync(l => l.LicenseNumber == dto.LicenseNumber && l.Id != id);
+                if (existing != null)
+                    throw new System.InvalidOperationException($"A license with License Number '{dto.LicenseNumber}' already exists.");
+            }
+
             var license = await _context.Licenses.Include(l => l.Hawker).FirstOrDefaultAsync(l => l.Id == id);
             if (license == null) return null;
 
@@ -107,10 +126,10 @@ namespace backend.Services
             var license = await _context.Licenses.Include(l => l.Hawker).FirstOrDefaultAsync(l => l.Id == id);
             if (license == null) return null;
 
-            if (license.Status == "Rejected")
+            if (license.Status == "REJECTED")
                 throw new System.InvalidOperationException("License is already rejected.");
 
-            license.Status = "Rejected";
+            license.Status = "REJECTED";
             license.RejectionReason = dto.RejectionReason;
             license.Remarks = dto.Remarks;
             license.RejectedById = userId;

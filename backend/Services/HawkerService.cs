@@ -43,7 +43,7 @@ namespace backend.Services
             else if (statusFilter != "All")
             {
                 // Default to showing only Active hawkers if status filter is not specified or not "All"
-                query = query.Where(h => h.Status == "Active");
+                query = query.Where(h => h.Status == "APPROVED");
             }
 
             var totalCount = await query.CountAsync();
@@ -72,6 +72,15 @@ namespace backend.Services
 
         public async Task<HawkerDto> CreateHawkerAsync(CreateHawkerDto dto, int? userId)
         {
+            if (dto.DOB.HasValue && dto.DOB.Value > System.DateTime.UtcNow)
+                throw new System.InvalidOperationException("Date of Birth cannot be in the future.");
+
+            if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
+            {
+                var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo == dto.EnrollmentNo);
+                if (existing != null)
+                    throw new System.InvalidOperationException($"A hawker with Enrollment Number '{dto.EnrollmentNo}' already exists.");
+            }
             var hawker = new Hawker
             {
                 EnrollmentNo = dto.EnrollmentNo,
@@ -102,6 +111,16 @@ namespace backend.Services
 
         public async Task<HawkerDto?> UpdateHawkerAsync(int id, UpdateHawkerDto dto, int? userId)
         {
+            if (dto.DOB.HasValue && dto.DOB.Value > System.DateTime.UtcNow)
+                throw new System.InvalidOperationException("Date of Birth cannot be in the future.");
+
+            if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
+            {
+                var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo == dto.EnrollmentNo && h.Id != id);
+                if (existing != null)
+                    throw new System.InvalidOperationException($"A hawker with Enrollment Number '{dto.EnrollmentNo}' already exists.");
+            }
+
             var hawker = await _context.Hawkers.FindAsync(id);
             if (hawker == null) return null;
 
@@ -134,10 +153,10 @@ namespace backend.Services
             var hawker = await _context.Hawkers.FindAsync(id);
             if (hawker == null) return null;
 
-            if (hawker.Status == "Rejected")
+            if (hawker.Status == "REJECTED")
                 throw new System.InvalidOperationException("Hawker is already rejected.");
 
-            hawker.Status = "Rejected";
+            hawker.Status = "REJECTED";
             hawker.RejectionReason = dto.RejectionReason;
             hawker.Remarks = dto.Remarks;
             hawker.RejectedById = userId;
@@ -168,7 +187,7 @@ namespace backend.Services
 
             var items = hawkers.Select(h =>
             {
-                var activeLicense = h.Licenses?.FirstOrDefault(l => l.Status == "Active");
+                var activeLicense = h.Licenses?.FirstOrDefault(l => l.Status == "APPROVED");
                 return new MasterHawkerReportDto
                 {
                     HawkerId = h.Id,
@@ -210,7 +229,7 @@ namespace backend.Services
             var query = _context.LicenseRenewals
                 .Include(r => r.License)
                 .ThenInclude(l => l.Hawker)
-                .Where(r => r.Status == "Approved")
+                .Where(r => r.Status == "APPROVED")
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchQuery))

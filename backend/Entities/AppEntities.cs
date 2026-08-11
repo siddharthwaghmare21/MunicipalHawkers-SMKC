@@ -41,7 +41,7 @@ namespace backend.Entities
         public string? LocationType { get; set; }
         public string? PartnerDependancy { get; set; }
 
-        public string Status { get; set; } = "Active";
+        public string Status { get; set; } = "DRAFT";
         public string? RejectionReason { get; set; }
         public string? Remarks { get; set; }
         public int? RejectedById { get; set; }
@@ -60,7 +60,7 @@ namespace backend.Entities
         public string LicenseNumber { get; set; } = string.Empty;
         public DateTime IssueDate { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public string Status { get; set; } = "Active";
+        public string Status { get; set; } = "DRAFT";
         public string? LicenseType { get; set; }
         public string? Remarks { get; set; }
         
@@ -79,7 +79,7 @@ namespace backend.Entities
         public License? License { get; set; }
         public DateTime RenewalDate { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = "UNDER_REVIEW";
         public int? UserId { get; set; }
         public User? User { get; set; }
         public string? Remarks { get; set; }
@@ -105,7 +105,7 @@ namespace backend.Entities
         public string OriginalFileName { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;
         public long FileSize { get; set; }
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = "UNDER_REVIEW";
         public string? Remarks { get; set; }
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;
     }

@@ -65,6 +65,97 @@ namespace backend.Data
                 context.DocumentTypes.AddRange(docTypes);
                 context.SaveChanges();
             }
+
+            // Seed Dummy Data for Development
+            if (!context.Hawkers.Any())
+            {
+                var businessTypes = new[] { "Vegetables", "Fruits", "Fast Food", "Garments", "Electronics", "Toys", "Utensils", "Spices", "Flowers", "Juice Center" };
+                var locations = new[] { "Station Road", "Market Area", "Main Chowk", "Temple Area", "Bus Stand", "Highway Touch", "School Road" };
+                var statuses = new[] { "DRAFT", "SUBMITTED", "UNDER_REVIEW", "APPROVED", "REJECTED" };
+                
+                var documentTypesList = context.DocumentTypes.ToList();
+                var deptAdminUser = context.Users.FirstOrDefault(u => u.Username == "deptadmin");
+
+                var hawkerFaker = new Bogus.Faker<Hawker>("en_IND")
+                    .RuleFor(h => h.EnrollmentNo, f => "SMKC" + f.Random.Number(10000, 99999).ToString())
+                    .RuleFor(h => h.FullName, f => f.Name.FullName())
+                    .RuleFor(h => h.Address, f => f.Address.StreetAddress() + ", " + f.Address.City())
+                    .RuleFor(h => h.Gender, f => f.PickRandom("Male", "Female"))
+                    .RuleFor(h => h.DOB, f => f.Date.Past(50, DateTime.Now.AddYears(-18)))
+                    .RuleFor(h => h.MobileNumber, f => "9" + f.Random.Number(100000000, 999999999).ToString())
+                    .RuleFor(h => h.Handicap, f => f.Random.Bool(0.1f)) // 10% chance
+                    .RuleFor(h => h.ULBName, "SMKC")
+                    .RuleFor(h => h.WardName, f => "Ward " + f.Random.Number(1, 10))
+                    .RuleFor(h => h.RoadName, f => f.PickRandom(locations))
+                    .RuleFor(h => h.LandMark, f => f.Address.SecondaryAddress())
+                    .RuleFor(h => h.AreaType, f => f.PickRandom("Commercial", "Residential", "Mixed"))
+                    .RuleFor(h => h.BusinessType, f => f.PickRandom(businessTypes))
+                    .RuleFor(h => h.BusinessTime, f => f.PickRandom("Morning", "Evening", "All Day"))
+                    .RuleFor(h => h.LocationType, f => f.PickRandom("Fixed", "Mobile"))
+                    .RuleFor(h => h.PartnerDependancy, f => f.PickRandom("None", "Spouse", "Children"))
+                    .RuleFor(h => h.Status, f => f.PickRandom(statuses));
+
+                var hawkers = hawkerFaker.Generate(50);
+
+                foreach (var hawker in hawkers)
+                {
+                    if (hawker.Status == "REJECTED")
+                    {
+                        hawker.RejectionReason = "Incomplete documents.";
+                        hawker.RejectedById = deptAdminUser?.Id;
+                        hawker.RejectedDate = DateTime.UtcNow.AddDays(-10);
+                    }
+
+                    // Generate a document
+                    if (documentTypesList.Any())
+                    {
+                        var docFaker = new Bogus.Faker<Document>()
+                            .RuleFor(d => d.DocumentTypeId, f => f.PickRandom(documentTypesList).Id)
+                            .RuleFor(d => d.FilePath, f => $"/uploads/dummy_{f.Random.AlphaNumeric(10)}.pdf")
+                            .RuleFor(d => d.OriginalFileName, f => f.System.FileName("pdf"))
+                            .RuleFor(d => d.ContentType, "application/pdf")
+                            .RuleFor(d => d.FileSize, f => f.Random.Number(100000, 5000000))
+                            .RuleFor(d => d.Status, f => hawker.Status == "APPROVED" ? "APPROVED" : f.PickRandom("UNDER_REVIEW", "APPROVED", "REJECTED"))
+                            .RuleFor(d => d.UploadDate, f => f.Date.Past(1));
+                        
+                        hawker.Documents.Add(docFaker.Generate());
+                    }
+
+                    // If approved, generate a license
+                    if (hawker.Status == "APPROVED")
+                    {
+                        var licenseStatuses = new[] { "ACTIVE", "EXPIRED", "SUSPENDED" };
+                        
+                        var licenseFaker = new Bogus.Faker<License>()
+                            .RuleFor(l => l.LicenseNumber, f => "LIC-" + f.Random.Number(1000, 9999).ToString())
+                            .RuleFor(l => l.IssueDate, f => f.Date.Past(2))
+                            .RuleFor(l => l.ExpiryDate, (f, l) => l.IssueDate.AddYears(1))
+                            .RuleFor(l => l.Status, f => f.PickRandom(licenseStatuses))
+                            .RuleFor(l => l.LicenseType, f => f.PickRandom("Temporary", "Permanent"))
+                            .RuleFor(l => l.Remarks, "Auto generated for testing");
+
+                        var license = licenseFaker.Generate();
+
+                        // Create renewals for some licenses
+                        if (license.Status == "EXPIRED" || new Random().NextDouble() > 0.5)
+                        {
+                            var renewalFaker = new Bogus.Faker<LicenseRenewal>()
+                                .RuleFor(r => r.RenewalDate, f => f.Date.Recent(30))
+                                .RuleFor(r => r.ExpiryDate, (f, r) => r.RenewalDate.AddYears(1))
+                                .RuleFor(r => r.Status, f => f.PickRandom("UNDER_REVIEW", "APPROVED", "REJECTED"))
+                                .RuleFor(r => r.UserId, deptAdminUser?.Id)
+                                .RuleFor(r => r.Remarks, "Renewal requested");
+                                
+                            license.LicenseRenewals.Add(renewalFaker.Generate());
+                        }
+
+                        hawker.Licenses.Add(license);
+                    }
+                }
+
+                context.Hawkers.AddRange(hawkers);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

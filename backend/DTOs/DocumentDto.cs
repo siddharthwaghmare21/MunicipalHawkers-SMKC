@@ -13,7 +13,7 @@ namespace backend.DTOs
         public string OriginalFileName { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;
         public long FileSize { get; set; }
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = "UNDER_REVIEW";
         public string? Remarks { get; set; }
         public DateTime UploadDate { get; set; }
     }

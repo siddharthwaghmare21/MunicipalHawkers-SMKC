@@ -50,6 +50,12 @@ namespace backend.Services
                 var license = await _context.Licenses.FindAsync(dto.LicenseId);
                 if (license == null) return null;
 
+                if (license.Status == "REJECTED")
+                    throw new System.InvalidOperationException("Cannot renew a rejected license.");
+                
+                if (dto.ExpiryDate <= license.ExpiryDate)
+                    throw new System.InvalidOperationException("New Expiry Date must be later than the current Expiry Date.");
+
                 // 1. Preserve history by creating a LicenseRenewal record reflecting the PREVIOUS state.
                 // Or wait, the requirement is "Create LicenseRenewal record, Update current license".
                 // Usually, the renewal record logs the transaction that just occurred, meaning the NEW expiry and status.

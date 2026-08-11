@@ -1,3 +1,4 @@
+using backend.DTOs;
 using backend.DTOs.Auth;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,17 +22,17 @@ namespace backend.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(ApiResponse<object>.Error("Invalid request data"));
             }
 
             var response = await _authService.LoginAsync(request);
 
             if (!response.Success)
             {
-                return Unauthorized(response);
+                return Unauthorized(ApiResponse<LoginResponse>.Error(response.Message));
             }
 
-            return Ok(response);
+            return Ok(ApiResponse<LoginResponse>.Ok(response, "Login successful"));
         }
     }
 }

@@ -17,12 +17,12 @@ namespace backend.Services
         public async Task<DashboardDto> GetDashboardStatsAsync()
         {
             var totalHawkers = await _context.Hawkers.CountAsync();
-            var activeLicenses = await _context.Licenses.CountAsync(l => l.Status == "Active");
+            var activeLicenses = await _context.Licenses.CountAsync(l => l.Status == "APPROVED");
             var expiredLicenses = await _context.Licenses.CountAsync(l => l.Status == "Expired");
-            var pendingLicenses = await _context.Licenses.CountAsync(l => l.Status == "Pending");
-            var rejectedHawkers = await _context.Hawkers.CountAsync(h => h.Status == "Rejected");
-            var renewedLicenses = await _context.LicenseRenewals.CountAsync(r => r.Status == "Approved");
-            var pendingRenewals = await _context.LicenseRenewals.CountAsync(r => r.Status == "Pending");
+            var pendingLicenses = await _context.Licenses.CountAsync(l => l.Status == "UNDER_REVIEW");
+            var rejectedHawkers = await _context.Hawkers.CountAsync(h => h.Status == "REJECTED");
+            var renewedLicenses = await _context.LicenseRenewals.CountAsync(r => r.Status == "APPROVED");
+            var pendingRenewals = await _context.LicenseRenewals.CountAsync(r => r.Status == "UNDER_REVIEW");
 
             var recentlyAddedHawkers = await _context.Hawkers
                 .OrderByDescending(h => h.Id)
@@ -40,7 +40,7 @@ namespace backend.Services
             var recentlyRenewedHawkers = await _context.LicenseRenewals
                 .Include(r => r.License)
                 .ThenInclude(l => l.Hawker)
-                .Where(r => r.Status == "Approved")
+                .Where(r => r.Status == "APPROVED")
                 .OrderByDescending(r => r.RenewalDate)
                 .Take(5)
                 .Select(r => new LicenseRenewalSummaryDto

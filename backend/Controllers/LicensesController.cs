@@ -26,12 +26,7 @@ namespace backend.Controllers
             [FromQuery] int pageSize = 10)
         {
             var result = await _licenseService.GetAllLicensesAsync(search, status, page, pageSize);
-            return Ok(new ApiResponse<PaginatedResult<LicenseDto>>
-            {
-                Success = true,
-                Message = "Licenses retrieved successfully",
-                Data = result
-            });
+            return Ok(ApiResponse<PaginatedResult<LicenseDto>>.Ok(result, "Licenses retrieved successfully"));
         }
 
         [HttpGet("{id}")]
@@ -40,19 +35,10 @@ namespace backend.Controllers
             var license = await _licenseService.GetLicenseByIdAsync(id);
             if (license == null)
             {
-                return NotFound(new ApiResponse<LicenseDto>
-                {
-                    Success = false,
-                    Message = $"License with id {id} not found."
-                });
+                return NotFound(ApiResponse<LicenseDto>.Error($"License with id {id} not found."));
             }
 
-            return Ok(new ApiResponse<LicenseDto>
-            {
-                Success = true,
-                Message = "License retrieved successfully",
-                Data = license
-            });
+            return Ok(ApiResponse<LicenseDto>.Ok(license, "License retrieved successfully"));
         }
 
         [HttpPost]
@@ -62,12 +48,7 @@ namespace backend.Controllers
             int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
 
             var license = await _licenseService.CreateLicenseAsync(dto, userId);
-            return CreatedAtAction(nameof(GetLicense), new { id = license.Id }, new ApiResponse<LicenseDto>
-            {
-                Success = true,
-                Message = "License created successfully",
-                Data = license
-            });
+            return CreatedAtAction(nameof(GetLicense), new { id = license.Id }, ApiResponse<LicenseDto>.Ok(license, "License created successfully"));
         }
 
         [HttpPut("{id}")]
@@ -79,19 +60,10 @@ namespace backend.Controllers
             var license = await _licenseService.UpdateLicenseAsync(id, dto, userId);
             if (license == null)
             {
-                return NotFound(new ApiResponse<LicenseDto>
-                {
-                    Success = false,
-                    Message = $"License with id {id} not found."
-                });
+                return NotFound(ApiResponse<LicenseDto>.Error($"License with id {id} not found."));
             }
 
-            return Ok(new ApiResponse<LicenseDto>
-            {
-                Success = true,
-                Message = "License updated successfully",
-                Data = license
-            });
+            return Ok(ApiResponse<LicenseDto>.Ok(license, "License updated successfully"));
         }
 
         [HttpPost("{id}/reject")]
@@ -105,27 +77,14 @@ namespace backend.Controllers
                 var license = await _licenseService.RejectLicenseAsync(id, dto, userId);
                 if (license == null)
                 {
-                    return NotFound(new ApiResponse<LicenseDto>
-                    {
-                        Success = false,
-                        Message = $"License with id {id} not found."
-                    });
+                    return NotFound(ApiResponse<LicenseDto>.Error($"License with id {id} not found."));
                 }
 
-                return Ok(new ApiResponse<LicenseDto>
-                {
-                    Success = true,
-                    Message = "License rejected successfully",
-                    Data = license
-                });
+                return Ok(ApiResponse<LicenseDto>.Ok(license, "License rejected successfully"));
             }
             catch (System.InvalidOperationException ex)
             {
-                return BadRequest(new ApiResponse<LicenseDto>
-                {
-                    Success = false,
-                    Message = ex.Message
-                });
+                return BadRequest(ApiResponse<LicenseDto>.Error(ex.Message));
             }
         }
     }
