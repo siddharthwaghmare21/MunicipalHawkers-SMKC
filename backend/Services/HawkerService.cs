@@ -10,10 +10,12 @@ namespace backend.Services
     public class HawkerService : IHawkerService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAuditLogService _auditLogService;
 
-        public HawkerService(ApplicationDbContext context)
+        public HawkerService(ApplicationDbContext context, IAuditLogService auditLogService)
         {
             _context = context;
+            _auditLogService = auditLogService;
         }
 
         public async Task<PaginatedResult<HawkerDto>> GetAllHawkersAsync(string? searchQuery = null, string? zoneFilter = null, string? statusFilter = null, int page = 1, int pageSize = 10)
@@ -68,7 +70,7 @@ namespace backend.Services
             return MapToDto(hawker);
         }
 
-        public async Task<HawkerDto> CreateHawkerAsync(CreateHawkerDto dto)
+        public async Task<HawkerDto> CreateHawkerAsync(CreateHawkerDto dto, int? userId)
         {
             var hawker = new Hawker
             {
@@ -92,10 +94,13 @@ namespace backend.Services
 
             _context.Hawkers.Add(hawker);
             await _context.SaveChangesAsync();
+
+            await _auditLogService.LogActionAsync(userId, "Add Hawker", "Hawker", hawker.Id.ToString(), $"Hawker '{hawker.FullName}' added.");
+
             return MapToDto(hawker);
         }
 
-        public async Task<HawkerDto?> UpdateHawkerAsync(int id, UpdateHawkerDto dto)
+        public async Task<HawkerDto?> UpdateHawkerAsync(int id, UpdateHawkerDto dto, int? userId)
         {
             var hawker = await _context.Hawkers.FindAsync(id);
             if (hawker == null) return null;
@@ -118,6 +123,9 @@ namespace backend.Services
             hawker.PartnerDependancy = dto.PartnerDependancy;
 
             await _context.SaveChangesAsync();
+
+            await _auditLogService.LogActionAsync(userId, "Edit Hawker", "Hawker", hawker.Id.ToString(), $"Hawker '{hawker.FullName}' updated.");
+
             return MapToDto(hawker);
         }
 
@@ -135,15 +143,120 @@ namespace backend.Services
             hawker.RejectedById = userId;
             hawker.RejectedDate = System.DateTime.UtcNow;
 
-            _context.AuditLogs.Add(new AuditLog
-            {
-                Action = "Reject Hawker",
-                UserId = userId,
-                Details = $"Hawker {id} rejected. Reason: {dto.RejectionReason}"
-            });
+            await _auditLogService.LogActionAsync(userId, "Reject Hawker", "Hawker", hawker.Id.ToString(), $"Hawker {hawker.Id} rejected. Reason: {dto.RejectionReason}");
 
             await _context.SaveChangesAsync();
             return MapToDto(hawker);
+        }
+
+        public async Task<PaginatedResult<MasterHawkerReportDto>> GetMasterReportAsync(string? searchQuery, int page, int pageSize)
+        {
+            var query = _context.Hawkers
+                .Include(h => h.Licenses)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(h => h.EnrollmentNo.Contains(searchQuery) || h.FullName.Contains(searchQuery));
+            }
+
+            var totalItems = await query.CountAsync();
+            var hawkers = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = hawkers.Select(h =>
+            {
+                var activeLicense = h.Licenses?.FirstOrDefault(l => l.Status == "Active");
+                return new MasterHawkerReportDto
+                {
+                    HawkerId = h.Id,
+                    EnrollmentNo = h.EnrollmentNo,
+                    FullName = h.FullName,
+                    Address = h.Address,
+                    Gender = h.Gender,
+                    DOB = h.DOB,
+                    MobileNumber = h.MobileNumber,
+                    HandicapStatus = h.Handicap ? "Yes" : "No",
+                    ULBName = h.ULBName,
+                    WardName = h.WardName,
+                    RoadName = h.RoadName,
+                    LandMark = h.LandMark,
+                    AreaType = h.AreaType,
+                    BusinessType = h.BusinessType,
+                    BusinessTime = h.BusinessTime,
+                    LocationType = h.LocationType,
+                    PartnerDependancy = h.PartnerDependancy,
+                    
+                    LicenseNumber = activeLicense?.LicenseNumber,
+                    LicenseIssueDate = activeLicense?.IssueDate,
+                    LicenseExpiryDate = activeLicense?.ExpiryDate,
+                    LicenseStatus = activeLicense?.Status
+                };
+            }).ToList();
+
+            return new PaginatedResult<MasterHawkerReportDto>
+            {
+                Items = items,
+                TotalCount = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<PaginatedResult<RenewedHawkerReportDto>> GetRenewedHawkersReportAsync(string? searchQuery, DateTime? fromDate, DateTime? toDate, string? businessType, int page, int pageSize)
+        {
+            var query = _context.LicenseRenewals
+                .Include(r => r.License)
+                .ThenInclude(l => l.Hawker)
+                .Where(r => r.Status == "Approved")
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(r => r.License.Hawker.FullName.Contains(searchQuery));
+            }
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(r => r.RenewalDate >= fromDate.Value.Date);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(r => r.RenewalDate <= toDate.Value.Date.AddDays(1).AddTicks(-1));
+            }
+
+            if (!string.IsNullOrWhiteSpace(businessType))
+            {
+                query = query.Where(r => r.License.Hawker.BusinessType == businessType);
+            }
+
+            var totalItems = await query.CountAsync();
+            var renewals = await query
+                .OrderByDescending(r => r.RenewalDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = renewals.Select(r => new RenewedHawkerReportDto
+            {
+                Id = r.Id,
+                HawkerId = r.License.HawkerId,
+                Name = r.License.Hawker.FullName,
+                BusinessType = r.License.Hawker.BusinessType,
+                RenewDate = r.RenewalDate,
+                ExpiryDate = r.ExpiryDate
+            }).ToList();
+
+            return new PaginatedResult<RenewedHawkerReportDto>
+            {
+                Items = items,
+                TotalCount = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         private static HawkerDto MapToDto(Hawker hawker)

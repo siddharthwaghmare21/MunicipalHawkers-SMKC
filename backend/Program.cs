@@ -36,6 +36,7 @@ builder.Services.AddScoped<ILicenseRenewalService, LicenseRenewalService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 
 // Configure JWT Authentication
 var jwtSecret = builder.Configuration["JWT_SECRET"] ?? Environment.GetEnvironmentVariable("JWT_SECRET") ?? "fallback_secret_key_which_should_be_long_enough_12345!";

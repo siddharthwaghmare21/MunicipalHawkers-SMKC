@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN")]
+    [ApiController]
+    [Authorize]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
@@ -19,15 +19,10 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<DashboardDto>>> GetDashboardStats()
+        public async Task<IActionResult> GetDashboardMetrics()
         {
             var stats = await _dashboardService.GetDashboardStatsAsync();
-            return Ok(new ApiResponse<DashboardDto>
-            {
-                Success = true,
-                Message = "Dashboard stats retrieved successfully",
-                Data = stats
-            });
+            return Ok(stats);
         }
     }
 }

@@ -12,6 +12,7 @@ export function Sidebar({ isOpen, toggleSidebar }: { isOpen: boolean, toggleSide
     { label: 'Licenses', href: '/licenses', icon: '📄' },
     { label: 'Documents', href: '/documents', icon: '📁' },
     { label: 'Reports', href: '/reports', icon: '📈' },
+    { label: 'Audit Logs', href: '/audit-logs', icon: '📋' },
   ];
 
   return (

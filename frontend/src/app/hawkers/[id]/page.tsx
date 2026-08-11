@@ -28,7 +28,8 @@ const HAWKER_FIELDS = [
 
 export default async function ViewHawkerPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const token = cookies().get('token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
   
   let hawker: any = null;
   let error = '';

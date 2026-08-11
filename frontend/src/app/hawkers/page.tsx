@@ -15,7 +15,8 @@ export default async function HawkersPage({
   const zone = searchParams.zone || '';
   const status = searchParams.status || '';
   
-  const token = cookies().get('token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
   
   const queryParams = new URLSearchParams();
   queryParams.append('page', page.toString());
@@ -88,7 +89,6 @@ export default async function HawkersPage({
               <select 
                 name="zone" 
                 defaultValue={zone} 
-                onChange={(e) => e.target.form?.submit()}
                 className="border border-slate-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none text-slate-700"
               >
                 <option value="">All Zones</option>
@@ -100,13 +100,15 @@ export default async function HawkersPage({
               <select 
                 name="status" 
                 defaultValue={status} 
-                onChange={(e) => e.target.form?.submit()}
                 className="border border-slate-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none text-slate-700"
               >
                 <option value="">All Statuses</option>
                 <option value="Active">Active</option>
                 <option value="Rejected">Rejected</option>
               </select>
+              <button type="submit" className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                Filter
+              </button>
             </form>
           </div>
         </div>

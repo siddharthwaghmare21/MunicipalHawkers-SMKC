@@ -8,7 +8,8 @@ import { RejectButton } from '@/components/RejectButton';
 
 export default async function ViewLicensePage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const token = cookies().get('token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
   
   let license: any = null;
   let renewals: any[] = [];

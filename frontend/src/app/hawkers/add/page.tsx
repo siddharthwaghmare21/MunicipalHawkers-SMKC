@@ -24,6 +24,20 @@ const HAWKER_FIELDS = [
   { name: 'partnerDependancy', label: 'Partner Dependancy', type: 'text', required: true }
 ];
 
+const DOCUMENT_TYPES = [
+    { id: 1, name: "Aadhar Card" },
+    { id: 2, name: "Photo" },
+    { id: 3, name: "PAN Card" },
+    { id: 4, name: "Voter ID" },
+    { id: 5, name: "Ration Card" }
+];
+
+interface PendingDocument {
+  docTypeId: number;
+  docTypeName: string;
+  file: File;
+}
+
 export default function AddHawkerPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<Record<string, string>>({
@@ -32,10 +46,69 @@ export default function AddHawkerPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Document state
+  const [pendingDocuments, setPendingDocuments] = useState<PendingDocument[]>([]);
+  const [selectedDocType, setSelectedDocType] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [docError, setDocError] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleAddDocument = () => {
+    setDocError('');
+    if (!selectedDocType || !selectedFile) {
+      setDocError('Please select a document type and a file.');
+      return;
+    }
+
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setDocError('Invalid file type. Only PDF, JPG, and PNG are allowed.');
+      return;
+    }
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      setDocError('File size exceeds the 5MB limit.');
+      return;
+    }
+
+    const docTypeInfo = DOCUMENT_TYPES.find(d => d.id === parseInt(selectedDocType));
+    if (!docTypeInfo) return;
+
+    // Check if doc type already added
+    if (pendingDocuments.some(doc => doc.docTypeId === docTypeInfo.id)) {
+       setDocError(`${docTypeInfo.name} has already been added.`);
+       return;
+    }
+
+    setPendingDocuments(prev => [
+      ...prev,
+      {
+        docTypeId: docTypeInfo.id,
+        docTypeName: docTypeInfo.name,
+        file: selectedFile
+      }
+    ]);
+
+    // Reset selection
+    setSelectedDocType('');
+    setSelectedFile(null);
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
+  const removePendingDocument = (index: number) => {
+    setPendingDocuments(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,6 +117,7 @@ export default function AddHawkerPage() {
     setError('');
 
     try {
+      // 1. Create Hawker
       const res = await fetch('/api/hawkers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,16 +127,50 @@ export default function AddHawkerPage() {
         })
       });
 
-      if (res.ok) {
-        router.push('/hawkers');
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to create hawker');
+      }
+
+      const hawkerResponse = await res.json();
+      const newHawkerId = hawkerResponse.data?.id;
+
+      if (!newHawkerId) {
+        throw new Error('Hawker created but ID was not returned');
+      }
+
+      // 2. Upload Pending Documents
+      const uploadPromises = pendingDocuments.map(async (doc) => {
+        const docFormData = new FormData();
+        docFormData.append("HawkerId", newHawkerId.toString());
+        docFormData.append("DocumentTypeId", doc.docTypeId.toString());
+        docFormData.append("File", doc.file);
+
+        const uploadRes = await fetch("/api/documents/upload", {
+            method: "POST",
+            body: docFormData, 
+        });
+
+        if (!uploadRes.ok) {
+            throw new Error(`Failed to upload ${doc.docTypeName}`);
+        }
+      });
+
+      const uploadResults = await Promise.allSettled(uploadPromises);
+      const hasErrors = uploadResults.some(r => r.status === 'rejected');
+
+      if (hasErrors) {
+        // Redirect to edit page so they can retry failed docs
+        router.push(`/hawkers/${newHawkerId}`);
         router.refresh();
       } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to create hawker');
+        // All good
+        router.push('/hawkers');
+        router.refresh();
       }
+
     } catch (err: any) {
       setError(err.message || 'An error occurred');
-    } finally {
       setLoading(false);
     }
   };
@@ -118,8 +226,84 @@ export default function AddHawkerPage() {
               </div>
             ))}
           </div>
+          
+          <div className="pt-6 border-t border-slate-200 mt-6">
+             <h2 className="text-lg font-semibold text-slate-800 mb-4">Initial Documents (Optional)</h2>
+             
+             {docError && (
+                 <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200">
+                     {docError}
+                 </div>
+             )}
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+             <div className="flex flex-col md:flex-row gap-4 items-end mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div className="flex flex-col space-y-1 flex-1">
+                    <label className="text-sm font-medium text-slate-700">Document Type</label>
+                    <select
+                        value={selectedDocType}
+                        onChange={(e) => setSelectedDocType(e.target.value)}
+                        className="border border-slate-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                    >
+                        <option value="">Select Document</option>
+                        {DOCUMENT_TYPES.map((type) => (
+                            <option key={type.id} value={type.id}>{type.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-col space-y-1 flex-1">
+                    <label className="text-sm font-medium text-slate-700">File (PDF, JPG, PNG up to 5MB)</label>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        onChange={handleFileChange}
+                        accept=".pdf, .jpg, .jpeg, .png"
+                        className="border border-slate-300 bg-white rounded-md px-3 py-1.5 text-sm file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                    />
+                </div>
+                <button
+                    type="button"
+                    onClick={handleAddDocument}
+                    className="px-4 py-2 bg-slate-800 text-white rounded-md text-sm font-medium hover:bg-slate-700 transition-colors h-[38px]"
+                >
+                    Add Document
+                </button>
+             </div>
+
+             {pendingDocuments.length > 0 && (
+                <div className="border border-slate-200 rounded-lg overflow-hidden">
+                   <table className="w-full text-sm text-left">
+                       <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+                           <tr>
+                               <th className="px-4 py-3">Document Type</th>
+                               <th className="px-4 py-3">File Name</th>
+                               <th className="px-4 py-3">Size</th>
+                               <th className="px-4 py-3 text-right">Actions</th>
+                           </tr>
+                       </thead>
+                       <tbody className="divide-y divide-slate-200">
+                           {pendingDocuments.map((doc, i) => (
+                               <tr key={i} className="hover:bg-slate-50/50">
+                                   <td className="px-4 py-3 font-medium text-slate-800">{doc.docTypeName}</td>
+                                   <td className="px-4 py-3 text-slate-600 truncate max-w-[200px]">{doc.file.name}</td>
+                                   <td className="px-4 py-3 text-slate-500">{(doc.file.size / 1024 / 1024).toFixed(2)} MB</td>
+                                   <td className="px-4 py-3 text-right">
+                                       <button 
+                                           type="button" 
+                                           onClick={() => removePendingDocument(i)}
+                                           className="text-red-600 hover:text-red-800 font-medium"
+                                       >
+                                           Remove
+                                       </button>
+                                   </td>
+                               </tr>
+                           ))}
+                       </tbody>
+                   </table>
+                </div>
+             )}
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200 mt-8">
             <button
               type="button"
               onClick={() => router.push('/hawkers')}
@@ -140,3 +324,4 @@ export default function AddHawkerPage() {
     </div>
   );
 }
+

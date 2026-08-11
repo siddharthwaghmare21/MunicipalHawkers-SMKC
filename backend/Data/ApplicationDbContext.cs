@@ -25,6 +25,14 @@ namespace backend.Data
             modelBuilder.Entity<Hawker>()
                 .HasIndex(h => h.EnrollmentNo)
                 .IsUnique();
+
+            modelBuilder.Entity<DocumentType>().HasData(
+                new DocumentType { Id = 1, Name = "Aadhar Card", Description = "National Identity Card" },
+                new DocumentType { Id = 2, Name = "Photo", Description = "Passport size photograph" },
+                new DocumentType { Id = 3, Name = "PAN Card", Description = "Permanent Account Number Card" },
+                new DocumentType { Id = 4, Name = "Voter ID", Description = "Voter Identity Card" },
+                new DocumentType { Id = 5, Name = "Ration Card", Description = "Household Ration Card" }
+            );
         }
     }
 }

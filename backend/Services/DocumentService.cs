@@ -14,10 +14,12 @@ namespace backend.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly string _uploadDirectory;
+        private readonly IAuditLogService _auditLogService;
 
-        public DocumentService(ApplicationDbContext context)
+        public DocumentService(ApplicationDbContext context, IAuditLogService auditLogService)
         {
             _context = context;
+            _auditLogService = auditLogService;
             // Secure upload directory outside web root
             _uploadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "SecureUploads");
             if (!Directory.Exists(_uploadDirectory))
@@ -65,13 +67,7 @@ namespace backend.Services
 
             _context.Documents.Add(document);
             
-            _context.AuditLogs.Add(new AuditLog
-            {
-                Action = "Upload Document",
-                UserId = uploadedByUserId,
-                Timestamp = DateTime.UtcNow,
-                Details = $"Uploaded {docType.Name} for Hawker ID {uploadDto.HawkerId}. Document ID: {document.Id}"
-            });
+            await _auditLogService.LogActionAsync(uploadedByUserId, "Upload Document", "Document", document.Id.ToString(), $"Uploaded {docType.Name} for Hawker ID {uploadDto.HawkerId}. Document ID: {document.Id}");
 
             await _context.SaveChangesAsync();
 
@@ -126,13 +122,7 @@ namespace backend.Services
             document.Status = verifyDto.Status;
             document.Remarks = verifyDto.Remarks;
 
-            _context.AuditLogs.Add(new AuditLog
-            {
-                Action = $"Verify Document: {verifyDto.Status}",
-                UserId = verifiedByUserId,
-                Timestamp = DateTime.UtcNow,
-                Details = $"Document ID: {document.Id}. Status updated to {verifyDto.Status}. Remarks: {verifyDto.Remarks}"
-            });
+            await _auditLogService.LogActionAsync(verifiedByUserId, $"Verify Document: {verifyDto.Status}", "Document", document.Id.ToString(), $"Document ID: {document.Id}. Status updated to {verifyDto.Status}. Remarks: {verifyDto.Remarks}");
 
             await _context.SaveChangesAsync();
             return MapToDto(document, document.DocumentType.Name);

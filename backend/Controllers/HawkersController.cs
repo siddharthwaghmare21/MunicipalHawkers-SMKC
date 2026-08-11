@@ -35,6 +35,22 @@ namespace backend.Controllers
             });
         }
 
+        [HttpGet("report/master")]
+        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN,CLERK")]
+        public async Task<IActionResult> GetMasterReport([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _hawkerService.GetMasterReportAsync(search, page, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("report/renewed")]
+        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN,CLERK")]
+        public async Task<IActionResult> GetRenewedHawkersReport([FromQuery] string? search, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] string? businessType, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _hawkerService.GetRenewedHawkersReportAsync(search, fromDate, toDate, businessType, page, pageSize);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> GetHawker(int id)
         {
@@ -59,7 +75,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> CreateHawker([FromBody] CreateHawkerDto dto)
         {
-            var hawker = await _hawkerService.CreateHawkerAsync(dto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
+
+            var hawker = await _hawkerService.CreateHawkerAsync(dto, userId);
             return CreatedAtAction(nameof(GetHawker), new { id = hawker.Id }, new ApiResponse<HawkerDto>
             {
                 Success = true,
@@ -71,7 +90,10 @@ namespace backend.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> UpdateHawker(int id, [FromBody] UpdateHawkerDto dto)
         {
-            var hawker = await _hawkerService.UpdateHawkerAsync(id, dto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
+
+            var hawker = await _hawkerService.UpdateHawkerAsync(id, dto, userId);
             if (hawker == null)
             {
                 return NotFound(new ApiResponse<HawkerDto>

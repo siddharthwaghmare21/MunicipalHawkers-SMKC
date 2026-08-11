@@ -6,17 +6,24 @@ import { Badge } from '@/components/Badge';
 import { cookies } from 'next/headers';
 
 export default async function DashboardPage() {
-  const token = cookies().get('token')?.value;
-  
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
   let stats = {
     totalHawkers: 0,
     activeLicenses: 0,
+    pendingLicenses: 0,
+    rejectedHawkers: 0,
     expiredLicenses: 0,
-    pendingRenewals: 0
+    renewedLicenses: 0,
+    pendingRenewals: 0,
+    recentlyAddedHawkers: [] as any[],
+    recentlyRenewedHawkers: [] as any[]
   };
 
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109';
+
   try {
-    const res = await fetch('http://localhost:5109/api/dashboard', {
+    const res = await fetch(`${BACKEND_URL}/api/dashboard`, {
       headers: {
         'Authorization': `Bearer ${token}`
       },
@@ -24,10 +31,7 @@ export default async function DashboardPage() {
     });
     
     if (res.ok) {
-      const json = await res.json();
-      if (json.data) {
-        stats = json.data;
-      }
+      stats = await res.json();
     }
   } catch (err) {
     console.error('Error fetching dashboard stats:', err);
@@ -36,19 +40,11 @@ export default async function DashboardPage() {
   const summaryCards = [
     { title: 'Total Hawkers', value: stats.totalHawkers, color: 'border-blue-500' },
     { title: 'Active Licenses', value: stats.activeLicenses, color: 'border-green-500' },
+    { title: 'Pending Licenses', value: stats.pendingLicenses, color: 'border-amber-500' },
+    { title: 'Rejected Hawkers', value: stats.rejectedHawkers, color: 'border-red-500' },
     { title: 'Expired Licenses', value: stats.expiredLicenses, color: 'border-red-700' },
-    { title: 'Pending Renewals', value: stats.pendingRenewals, color: 'border-amber-500' },
-  ];
-
-  const recentHawkers = [
-    { id: 'HWK-001', name: 'Ramesh Patel', zone: 'Zone A', status: 'Active' },
-    { id: 'HWK-002', name: 'Sita Devi', zone: 'Zone C', status: 'Pending' },
-    { id: 'HWK-003', name: 'Abdul Khan', zone: 'Zone B', status: 'Active' },
-  ];
-
-  const recentRenewals = [
-    { id: 'LIC-992', name: 'Gita Sharma', expiryDate: '2027-08-10', status: 'Renewed' },
-    { id: 'LIC-993', name: 'John Doe', expiryDate: '2026-09-01', status: 'Pending' },
+    { title: 'Renewed Licenses', value: stats.renewedLicenses, color: 'border-emerald-500' },
+    { title: 'Pending Renewals', value: stats.pendingRenewals, color: 'border-orange-500' },
   ];
 
   return (
@@ -70,26 +66,34 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Recent Hawkers">
+          <Card title="Recently Added Hawkers">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3">ID</th>
+                    <th className="px-4 py-3">ID / Enrollment No</th>
                     <th className="px-4 py-3">Name</th>
-                    <th className="px-4 py-3">Zone</th>
+                    <th className="px-4 py-3">Mobile</th>
                     <th className="px-4 py-3">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recentHawkers.map((hawker, idx) => (
+                  {stats.recentlyAddedHawkers.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
+                        No recent hawkers found.
+                      </td>
+                    </tr>
+                  ) : stats.recentlyAddedHawkers.map((hawker: any, idx: number) => (
                     <tr key={idx} className="border-b border-slate-100">
-                      <td className="px-4 py-3 font-medium text-blue-600">{hawker.id}</td>
-                      <td className="px-4 py-3 text-slate-800">{hawker.name}</td>
-                      <td className="px-4 py-3 text-slate-600">{hawker.zone}</td>
+                      <td className="px-4 py-3 font-medium text-blue-600">
+                         {hawker.enrollmentNo || `HWK-${hawker.id}`}
+                      </td>
+                      <td className="px-4 py-3 text-slate-800">{hawker.fullName}</td>
+                      <td className="px-4 py-3 text-slate-600">{hawker.mobileNumber || '-'}</td>
                       <td className="px-4 py-3">
-                        <Badge variant={hawker.status === 'Active' ? 'success' : 'warning'}>
-                          {hawker.status}
+                        <Badge variant={hawker.status === 'Active' ? 'success' : hawker.status === 'Pending' ? 'warning' : 'danger'}>
+                          {hawker.status || 'Unknown'}
                         </Badge>
                       </td>
                     </tr>
@@ -99,28 +103,30 @@ export default async function DashboardPage() {
             </div>
           </Card>
           
-          <Card title="Recent Renewals">
+          <Card title="Recently Renewed Licenses">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3">License ID</th>
+                    <th className="px-4 py-3">License No</th>
                     <th className="px-4 py-3">Hawker Name</th>
+                    <th className="px-4 py-3">Renewal Date</th>
                     <th className="px-4 py-3">New Expiry</th>
-                    <th className="px-4 py-3">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recentRenewals.map((renewal, idx) => (
-                    <tr key={idx} className="border-b border-slate-100">
-                      <td className="px-4 py-3 font-medium text-blue-600">{renewal.id}</td>
-                      <td className="px-4 py-3 text-slate-800">{renewal.name}</td>
-                      <td className="px-4 py-3 text-slate-600">{renewal.expiryDate}</td>
-                      <td className="px-4 py-3">
-                        <Badge variant={renewal.status === 'Renewed' ? 'success' : 'warning'}>
-                          {renewal.status}
-                        </Badge>
+                  {stats.recentlyRenewedHawkers.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
+                        No recent renewals found.
                       </td>
+                    </tr>
+                  ) : stats.recentlyRenewedHawkers.map((renewal: any, idx: number) => (
+                    <tr key={idx} className="border-b border-slate-100">
+                      <td className="px-4 py-3 font-medium text-blue-600">{renewal.licenseNumber}</td>
+                      <td className="px-4 py-3 text-slate-800">{renewal.hawkerName}</td>
+                      <td className="px-4 py-3 text-slate-600">{new Date(renewal.renewalDate).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-slate-600">{new Date(renewal.expiryDate).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>

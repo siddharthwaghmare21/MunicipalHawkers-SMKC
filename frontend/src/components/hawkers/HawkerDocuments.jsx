@@ -6,10 +6,10 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin }) {
     const [documents, setDocuments] = useState([]);
     const [documentTypes, setDocumentTypes] = useState([
         { id: 1, name: "Aadhar Card" },
-        { id: 2, name: "PAN Card" },
-        { id: 3, name: "Hawker Photo" },
-        { id: 4, name: "Disability Certificate" },
-        { id: 5, name: "Other" }
+        { id: 2, name: "Photo" },
+        { id: 3, name: "PAN Card" },
+        { id: 4, name: "Voter ID" },
+        { id: 5, name: "Ration Card" }
     ]); // TODO: Fetch from API if we expose it, otherwise hardcode for now
     
     const [loading, setLoading] = useState(true);
@@ -54,6 +54,17 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin }) {
         e.preventDefault();
         if (!selectedDocType || !selectedFile) {
             setError("Please select a document type and file.");
+            return;
+        }
+
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(selectedFile.type)) {
+            setError("Invalid file type. Only PDF, JPG, and PNG are allowed.");
+            return;
+        }
+
+        if (selectedFile.size > 5 * 1024 * 1024) {
+            setError("File size exceeds the 5MB limit.");
             return;
         }
 

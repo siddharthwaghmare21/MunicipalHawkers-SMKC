@@ -10,7 +10,8 @@ export default async function LicensesPage({
 }: {
   searchParams: { page?: string; search?: string; status?: string };
 }) {
-  const token = cookies().get('token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
   const page = searchParams.page || '1';
   const search = searchParams.search || '';
   const status = searchParams.status || '';
@@ -104,7 +105,6 @@ export default async function LicensesPage({
                 <select 
                   name="status" 
                   defaultValue={status} 
-                  onChange={(e) => e.target.form?.submit()}
                   className="border border-slate-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
                 >
                   <option value="">All Statuses</option>
@@ -113,6 +113,9 @@ export default async function LicensesPage({
                   <option value="Rejected">Rejected</option>
                   <option value="Expired">Expired</option>
                 </select>
+                <button type="submit" className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Filter
+                </button>
               </form>
             </div>
           </div>

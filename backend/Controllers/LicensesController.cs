@@ -58,7 +58,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<ApiResponse<LicenseDto>>> CreateLicense([FromBody] CreateLicenseDto dto)
         {
-            var license = await _licenseService.CreateLicenseAsync(dto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
+
+            var license = await _licenseService.CreateLicenseAsync(dto, userId);
             return CreatedAtAction(nameof(GetLicense), new { id = license.Id }, new ApiResponse<LicenseDto>
             {
                 Success = true,
@@ -70,7 +73,10 @@ namespace backend.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<LicenseDto>>> UpdateLicense(int id, [FromBody] UpdateLicenseDto dto)
         {
-            var license = await _licenseService.UpdateLicenseAsync(id, dto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
+
+            var license = await _licenseService.UpdateLicenseAsync(id, dto, userId);
             if (license == null)
             {
                 return NotFound(new ApiResponse<LicenseDto>
