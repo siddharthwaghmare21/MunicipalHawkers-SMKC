@@ -52,7 +52,7 @@ export default async function LicensesPage(props: {
     switch (status) {
       case 'Active': return 'success';
       case 'Expired': return 'warning';
-      case 'Pending': return 'info';
+      case 'Pending': return 'default';
       case 'Rejected':
       case 'Cancelled':
       case 'Suspended': return 'danger';

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export async function GET(request: Request, { params }: { params: { licenseId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ licenseId: string }> }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
-  const backendRes = await fetch(`http://localhost:5109/api/renewals/license/${params.licenseId}`, {
+  const backendRes = await fetch(`http://localhost:5109/api/renewals/license/${(await params).licenseId}`, {
     headers: {
       'Authorization': `Bearer ${token}`
     },

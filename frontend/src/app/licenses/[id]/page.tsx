@@ -54,7 +54,7 @@ export default async function ViewLicensePage({ params }: { params: Promise<{ id
     switch (status) {
       case 'Active': return 'success';
       case 'Expired': return 'warning';
-      case 'Pending': return 'info';
+      case 'Pending': return 'default';
       case 'Rejected':
       case 'Cancelled':
       case 'Suspended': return 'danger';

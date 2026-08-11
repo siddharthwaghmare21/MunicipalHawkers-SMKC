@@ -244,7 +244,7 @@ export default function RenewedHawkersReportPage() {
                   <td className="px-4 py-3 font-medium text-slate-800">{item.name}</td>
                   <td className="px-4 py-3">{item.businessName || '-'}</td>
                   <td className="px-4 py-3">
-                    <Badge variant="neutral">{item.businessType || 'Other'}</Badge>
+                    <Badge variant="default">{item.businessType || 'Other'}</Badge>
                   </td>
                   <td className="px-4 py-3 text-slate-700 font-medium">
                     {new Date(item.renewDate).toLocaleDateString()}

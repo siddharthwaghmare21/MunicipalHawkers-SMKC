@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
-  const backendRes = await fetch(`http://localhost:5109/api/hawkers/${params.id}`, {
+  const backendRes = await fetch(`http://localhost:5109/api/hawkers/${(await params).id}`, {
     headers: {
       'Authorization': `Bearer ${token}`
     },
@@ -20,12 +20,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
   return NextResponse.json(data);
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   const body = await request.json();
 
-  const backendRes = await fetch(`http://localhost:5109/api/hawkers/${params.id}`, {
+  const backendRes = await fetch(`http://localhost:5109/api/hawkers/${(await params).id}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
