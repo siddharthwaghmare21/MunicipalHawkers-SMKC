@@ -5,6 +5,7 @@ import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { RejectButton } from '@/components/RejectButton';
 import { Badge } from '@/components/Badge';
+import HawkerDocuments from '@/components/hawkers/HawkerDocuments';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No' },
@@ -131,6 +132,10 @@ export default async function ViewHawkerPage({ params }: { params: { id: string 
             ))}
           </div>
           </Card>
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Documents</h2>
+            <HawkerDocuments hawkerId={id} isITAdmin={true} isDeptAdmin={true} />
+          </div>
         </>
       ) : (
         <Card>

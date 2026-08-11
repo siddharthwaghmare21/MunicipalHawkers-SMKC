@@ -52,6 +52,19 @@ namespace backend.Data
             }
 
             await context.SaveChangesAsync();
+            if (!context.DocumentTypes.Any())
+            {
+                var docTypes = new List<DocumentType>
+                {
+                    new DocumentType { Name = "Aadhar Card", Description = "Aadhar Card (Front and Back)" },
+                    new DocumentType { Name = "PAN Card", Description = "PAN Card" },
+                    new DocumentType { Name = "Hawker Photo", Description = "Passport size photo of the Hawker" },
+                    new DocumentType { Name = "Disability Certificate", Description = "Certificate for handicapped hawkers" },
+                    new DocumentType { Name = "Other", Description = "Any other relevant document" }
+                };
+                context.DocumentTypes.AddRange(docTypes);
+                context.SaveChanges();
+            }
         }
     }
 }
