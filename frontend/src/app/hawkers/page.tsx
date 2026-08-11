@@ -145,10 +145,7 @@ export default async function HawkersPage(props: {
                       <span>✏️</span>
                       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Edit</span>
                     </Link>
-                    <Link href={`/licenses/add?hawkerId=${hawker.id}`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
-                      <span>➕</span>
-                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Add License</span>
-                    </Link>
+
                     <Link href={`/licenses/${hawker.id}/renew`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
                       <span>🔄</span>
                       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Renew</span>

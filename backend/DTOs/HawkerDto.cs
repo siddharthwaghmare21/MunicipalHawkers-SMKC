@@ -92,6 +92,8 @@ namespace backend.DTOs
         [Required(ErrorMessage = "Partner Dependancy is required.")]
         [StringLength(50)]
         public string? PartnerDependancy { get; set; }
+
+        public DateTime? LicenseExpiryDate { get; set; }
     }
 
     public class UpdateHawkerDto : CreateHawkerDto

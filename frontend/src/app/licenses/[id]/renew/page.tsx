@@ -29,9 +29,9 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
         if (json.data) {
           setLicense(json.data);
           
-          if (json.data.expiryDate) {
-            setExpiryDate(new Date(json.data.expiryDate).toISOString().split('T')[0]);
-          }
+          const baseDate = json.data.expiryDate ? new Date(json.data.expiryDate) : new Date();
+          baseDate.setFullYear(baseDate.getFullYear() + 5);
+          setExpiryDate(baseDate.toISOString().split('T')[0]);
           setLicenseType(json.data.licenseType || 'Standard');
           setStatus(json.data.status || 'Active');
         } else {

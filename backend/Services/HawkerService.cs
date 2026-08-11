@@ -104,7 +104,24 @@ namespace backend.Services
             _context.Hawkers.Add(hawker);
             await _context.SaveChangesAsync();
 
-            await _auditLogService.LogActionAsync(userId, "Add Hawker", "Hawker", hawker.Id.ToString(), $"Hawker '{hawker.FullName}' added.");
+            var monthYear = System.DateTime.UtcNow.ToString("MMMM-yyyy");
+            var licenseNo = $"LIC-{hawker.EnrollmentNo}-{monthYear}";
+            var defaultExpiry = new System.DateTime(System.DateTime.UtcNow.Year + 5, System.DateTime.UtcNow.Month, 1).AddMonths(1).AddDays(-1);
+
+            var license = new License
+            {
+                HawkerId = hawker.Id,
+                LicenseNumber = licenseNo,
+                IssueDate = System.DateTime.UtcNow,
+                ExpiryDate = dto.LicenseExpiryDate ?? defaultExpiry,
+                LicenseType = "Standard",
+                Status = "APPROVED"
+            };
+
+            _context.Licenses.Add(license);
+            await _context.SaveChangesAsync();
+
+            await _auditLogService.LogActionAsync(userId, "Add Hawker", "Hawker", hawker.Id.ToString(), $"Hawker '{hawker.FullName}' and default license added.");
 
             return MapToDto(hawker);
         }

@@ -21,8 +21,15 @@ const HAWKER_FIELDS = [
   { name: 'businessType', label: 'Business Type', type: 'text', required: true },
   { name: 'businessTime', label: 'Business Time', type: 'text', required: true },
   { name: 'locationType', label: 'Location Type', type: 'text', required: true },
-  { name: 'partnerDependancy', label: 'Partner Dependancy', type: 'text', required: true }
+  { name: 'partnerDependancy', label: 'Partner Dependancy', type: 'text', required: true },
+  { name: 'licenseExpiryDate', label: 'License Expiry Date', type: 'date', required: true }
 ];
+
+const getDefaultExpiryDate = () => {
+  const date = new Date();
+  const targetDate = new Date(date.getFullYear() + 5, date.getMonth() + 1, 0);
+  return targetDate.toISOString().split('T')[0];
+};
 
 const DOCUMENT_TYPES = [
     { id: 1, name: "Aadhar Card" },
@@ -42,7 +49,8 @@ export default function AddHawkerPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<Record<string, string>>({
     gender: 'Male',
-    handicap: 'No'
+    handicap: 'No',
+    licenseExpiryDate: getDefaultExpiryDate()
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
