@@ -223,11 +223,11 @@ export default function RenewedHawkersReportPage() {
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 print:bg-transparent">
               <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Business Name</th>
-                <th className="px-4 py-3">Business Type</th>
-                <th className="px-4 py-3">Renew Date</th>
-                <th className="px-4 py-3">Expiry Date</th>
+                <th className="px-4 py-3 text-center">Name</th>
+                <th className="px-4 py-3 text-center">Business Name</th>
+                <th className="px-4 py-3 text-center">Business Type</th>
+                <th className="px-4 py-3 text-center">Renew Date</th>
+                <th className="px-4 py-3 text-center">Expiry Date</th>
               </tr>
             </thead>
             <tbody>
@@ -241,15 +241,15 @@ export default function RenewedHawkersReportPage() {
                 </tr>
               ) : data.map((item, idx) => (
                 <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 print:break-inside-avoid">
-                  <td className="px-4 py-3 font-medium text-slate-800">{item.name}</td>
-                  <td className="px-4 py-3">{item.businessName || '-'}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 font-medium text-slate-800 text-center">{item.name}</td>
+                  <td className="px-4 py-3 text-center">{item.businessName || '-'}</td>
+                  <td className="px-4 py-3 text-center">
                     <Badge variant="default">{item.businessType || 'Other'}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-700 font-medium">
+                  <td className="px-4 py-3 text-slate-700 font-medium text-center">
                     {new Date(item.renewDate).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 text-slate-700">
+                  <td className="px-4 py-3 text-slate-700 text-center">
                     {new Date(item.expiryDate).toLocaleDateString()}
                   </td>
                 </tr>

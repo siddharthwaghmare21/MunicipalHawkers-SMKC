@@ -122,36 +122,42 @@ export default async function LicensesPage(props: {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">License No</th>
-                  <th className="px-4 py-3">License Type</th>
-                  <th className="px-4 py-3">Hawker ID</th>
-                  <th className="px-4 py-3">Issue Date</th>
-                  <th className="px-4 py-3">Expiry Date</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3 text-center">License No</th>
+                  <th className="px-4 py-3 text-center">License Type</th>
+                  <th className="px-4 py-3 text-center">Hawker ID</th>
+                  <th className="px-4 py-3 text-center">Issue Date</th>
+                  <th className="px-4 py-3 text-center">Expiry Date</th>
+                  <th className="px-4 py-3 text-center">Status</th>
+                  <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {licenses.length > 0 ? (
                   licenses.map((lic: any, idx: number) => (
                     <tr key={lic.id || idx} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="px-4 py-3 font-medium text-brand-primary">{lic.licenseNumber}</td>
-                      <td className="px-4 py-3 text-slate-800">{lic.licenseType}</td>
-                      <td className="px-4 py-3 text-slate-800">{lic.hawkerId}</td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 font-medium text-brand-primary text-center">{lic.licenseNumber}</td>
+                      <td className="px-4 py-3 text-slate-800 text-center">{lic.licenseType}</td>
+                      <td className="px-4 py-3 text-slate-800 text-center">{lic.hawkerId}</td>
+                      <td className="px-4 py-3 text-slate-600 text-center">
                         {lic.issueDate ? new Date(lic.issueDate).toLocaleDateString() : 'N/A'}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 text-center">
                         {lic.expiryDate ? new Date(lic.expiryDate).toLocaleDateString() : 'N/A'}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-center">
                         <Badge variant={getStatusVariant(lic.status)}>
                           {lic.status || 'Unknown'}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-right space-x-3">
-                        <Link href={`/licenses/${lic.id}`} className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm">View</Link>
-                        <Link href={`/licenses/${lic.id}/edit`} className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm">Edit</Link>
+                      <td className="px-4 py-3 flex justify-center space-x-3 items-center h-full">
+                        <Link href={`/licenses/${lic.id}`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                          <span>👁️</span>
+                          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">View</span>
+                        </Link>
+                        <Link href={`/licenses/${lic.id}/edit`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                          <span>✏️</span>
+                          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Edit</span>
+                        </Link>
                       </td>
                     </tr>
                   ))

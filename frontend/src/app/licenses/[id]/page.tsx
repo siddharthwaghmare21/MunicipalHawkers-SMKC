@@ -171,24 +171,24 @@ export default async function ViewLicensePage({ params }: { params: Promise<{ id
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                     <tr>
-                      <th className="px-4 py-3">Renewal Date</th>
-                      <th className="px-4 py-3">New Expiry Date</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Renewed By</th>
-                      <th className="px-4 py-3">Remarks</th>
+                      <th className="px-4 py-3 text-center">Renewal Date</th>
+                      <th className="px-4 py-3 text-center">New Expiry Date</th>
+                      <th className="px-4 py-3 text-center">Status</th>
+                      <th className="px-4 py-3 text-center">Renewed By</th>
+                      <th className="px-4 py-3 text-center">Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
                     {renewals.length > 0 ? (
                       renewals.map((r: any) => (
                         <tr key={r.id} className="border-b border-slate-100">
-                          <td className="px-4 py-3">{new Date(r.renewalDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-medium">{new Date(r.expiryDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 text-center">{new Date(r.renewalDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 font-medium text-center">{new Date(r.expiryDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-center">
                             <Badge variant={getStatusVariant(r.status)}>{r.status}</Badge>
                           </td>
-                          <td className="px-4 py-3">{r.username || 'N/A'}</td>
-                          <td className="px-4 py-3 text-slate-500">{r.remarks || '-'}</td>
+                          <td className="px-4 py-3 text-center">{r.username || 'N/A'}</td>
+                          <td className="px-4 py-3 text-slate-500 text-center">{r.remarks || '-'}</td>
                         </tr>
                       ))
                     ) : (

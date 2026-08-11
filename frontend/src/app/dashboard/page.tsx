@@ -76,10 +76,10 @@ export default async function DashboardPage() {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3">ID / Enrollment No</th>
-                    <th className="px-4 py-3">Name</th>
-                    <th className="px-4 py-3">Mobile</th>
-                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-center">ID / Enrollment No</th>
+                    <th className="px-4 py-3 text-center">Name</th>
+                    <th className="px-4 py-3 text-center">Mobile</th>
+                    <th className="px-4 py-3 text-center">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -91,12 +91,12 @@ export default async function DashboardPage() {
                     </tr>
                   ) : stats.recentlyAddedHawkers.map((hawker: any, idx: number) => (
                     <tr key={idx} className="border-b border-slate-100">
-                      <td className="px-4 py-3 font-medium text-brand-primary">
+                      <td className="px-4 py-3 font-medium text-brand-primary text-center">
                          {hawker.enrollmentNo || `HWK-${hawker.id}`}
                       </td>
-                      <td className="px-4 py-3 text-slate-800">{hawker.fullName}</td>
-                      <td className="px-4 py-3 text-slate-600">{hawker.mobileNumber || '-'}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-slate-800 text-center">{hawker.fullName}</td>
+                      <td className="px-4 py-3 text-slate-600 text-center">{hawker.mobileNumber || '-'}</td>
+                      <td className="px-4 py-3 text-center">
                         <Badge variant={hawker.status === 'Active' ? 'success' : hawker.status === 'Pending' ? 'warning' : 'danger'}>
                           {hawker.status || 'Unknown'}
                         </Badge>
@@ -113,10 +113,10 @@ export default async function DashboardPage() {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3">License No</th>
-                    <th className="px-4 py-3">Hawker Name</th>
-                    <th className="px-4 py-3">Renewal Date</th>
-                    <th className="px-4 py-3">New Expiry</th>
+                    <th className="px-4 py-3 text-center">License No</th>
+                    <th className="px-4 py-3 text-center">Hawker Name</th>
+                    <th className="px-4 py-3 text-center">Renewal Date</th>
+                    <th className="px-4 py-3 text-center">New Expiry</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -128,10 +128,10 @@ export default async function DashboardPage() {
                     </tr>
                   ) : stats.recentlyRenewedHawkers.map((renewal: any, idx: number) => (
                     <tr key={idx} className="border-b border-slate-100">
-                      <td className="px-4 py-3 font-medium text-brand-primary">{renewal.licenseNumber}</td>
-                      <td className="px-4 py-3 text-slate-800">{renewal.hawkerName}</td>
-                      <td className="px-4 py-3 text-slate-600">{new Date(renewal.renewalDate).toLocaleDateString()}</td>
-                      <td className="px-4 py-3 text-slate-600">{new Date(renewal.expiryDate).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 font-medium text-brand-primary text-center">{renewal.licenseNumber}</td>
+                      <td className="px-4 py-3 text-slate-800 text-center">{renewal.hawkerName}</td>
+                      <td className="px-4 py-3 text-slate-600 text-center">{new Date(renewal.renewalDate).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-slate-600 text-center">{new Date(renewal.expiryDate).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>

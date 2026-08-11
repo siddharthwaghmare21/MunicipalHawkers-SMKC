@@ -196,14 +196,14 @@ export default function MasterHawkerReportPage() {
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 print:bg-transparent">
               <tr>
-                <th className="px-4 py-3">Enrollment No</th>
-                <th className="px-4 py-3">Full Name</th>
-                <th className="px-4 py-3">Gender / DOB</th>
-                <th className="px-4 py-3">Mobile Number</th>
-                <th className="px-4 py-3">Ward & Address</th>
-                <th className="px-4 py-3">Business Details</th>
-                <th className="px-4 py-3">License Info</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-center">Enrollment No</th>
+                <th className="px-4 py-3 text-center">Full Name</th>
+                <th className="px-4 py-3 text-center">Gender / DOB</th>
+                <th className="px-4 py-3 text-center">Mobile Number</th>
+                <th className="px-4 py-3 text-center">Ward & Address</th>
+                <th className="px-4 py-3 text-center">Business Details</th>
+                <th className="px-4 py-3 text-center">License Info</th>
+                <th className="px-4 py-3 text-center">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -217,22 +217,22 @@ export default function MasterHawkerReportPage() {
                 </tr>
               ) : data.map((item, idx) => (
                 <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 print:break-inside-avoid">
-                  <td className="px-4 py-3 font-medium text-slate-800">{item.enrollmentNo || '-'}</td>
-                  <td className="px-4 py-3">{item.fullName}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 font-medium text-slate-800 text-center">{item.enrollmentNo || '-'}</td>
+                  <td className="px-4 py-3 text-center">{item.fullName}</td>
+                  <td className="px-4 py-3 text-center">
                     <div>{item.gender || '-'}</div>
                     <div className="text-xs text-slate-500">{item.dob ? new Date(item.dob).toLocaleDateString() : '-'}</div>
                   </td>
-                  <td className="px-4 py-3">{item.mobileNumber || '-'}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-center">{item.mobileNumber || '-'}</td>
+                  <td className="px-4 py-3 text-center">
                     <div className="font-medium text-slate-700">{item.wardName || '-'}</div>
-                    <div className="text-xs text-slate-500 truncate max-w-[200px]" title={item.address}>{item.address || '-'}</div>
+                    <div className="text-xs text-slate-500 truncate max-w-[200px] mx-auto" title={item.address}>{item.address || '-'}</div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-center">
                     <div>{item.businessType || '-'}</div>
                     <div className="text-xs text-slate-500">{item.areaType || '-'}</div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-center">
                     {item.licenseNumber ? (
                       <>
                         <div className="font-medium text-brand-primary">{item.licenseNumber}</div>
@@ -244,7 +244,7 @@ export default function MasterHawkerReportPage() {
                       <span className="text-slate-400 italic">No License</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-center">
                     <Badge variant={item.hawkerStatus === 'Active' ? 'success' : item.hawkerStatus === 'Pending' ? 'warning' : 'danger'}>
                       {item.hawkerStatus}
                     </Badge>

@@ -116,12 +116,12 @@ export default async function HawkersPage(props: {
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
               <tr>
-                <th className="px-4 py-3">ID</th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Mobile</th>
-                <th className="px-4 py-3">Zone</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-center">ID</th>
+                <th className="px-4 py-3 text-center">Name</th>
+                <th className="px-4 py-3 text-center">Mobile</th>
+                <th className="px-4 py-3 text-center">Zone</th>
+                <th className="px-4 py-3 text-center">Type</th>
+                <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -131,14 +131,32 @@ export default async function HawkersPage(props: {
                 </tr>
               ) : items.map((hawker: any) => (
                 <tr key={hawker.id} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-brand-primary">{hawker.enrollmentNo || hawker.id}</td>
-                  <td className="px-4 py-3 text-slate-800 font-medium">{hawker.fullName}</td>
-                  <td className="px-4 py-3 text-slate-600">{hawker.mobileNumber}</td>
-                  <td className="px-4 py-3 text-slate-600">{hawker.zone || 'N/A'}</td>
-                  <td className="px-4 py-3 text-slate-600">{hawker.businessType}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/hawkers/${hawker.id}`} className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm mr-3">View</Link>
-                    <Link href={`/hawkers/${hawker.id}/edit`} className="text-slate-500 hover:text-slate-700 font-medium text-sm">Edit</Link>
+                  <td className="px-4 py-3 font-medium text-brand-primary text-center">{hawker.enrollmentNo || hawker.id}</td>
+                  <td className="px-4 py-3 text-slate-800 font-medium text-center">{hawker.fullName}</td>
+                  <td className="px-4 py-3 text-slate-600 text-center">{hawker.mobileNumber}</td>
+                  <td className="px-4 py-3 text-slate-600 text-center">{hawker.zone || 'N/A'}</td>
+                  <td className="px-4 py-3 text-slate-600 text-center">{hawker.businessType}</td>
+                  <td className="px-4 py-3 flex justify-center space-x-3 items-center h-full">
+                    <Link href={`/hawkers/${hawker.id}`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                      <span>👁️</span>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">View</span>
+                    </Link>
+                    <Link href={`/hawkers/${hawker.id}/edit`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                      <span>✏️</span>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Edit</span>
+                    </Link>
+                    <Link href={`/licenses/add?hawkerId=${hawker.id}`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                      <span>➕</span>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Add License</span>
+                    </Link>
+                    <Link href={`/licenses/${hawker.id}/renew`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                      <span>🔄</span>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Renew</span>
+                    </Link>
+                    <button className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0 cursor-pointer">
+                      <span>❌</span>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Reject</span>
+                    </button>
                   </td>
                 </tr>
               ))}

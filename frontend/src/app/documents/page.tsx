@@ -25,25 +25,25 @@ export default function DocumentsPage() {
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
               <tr>
-                <th className="px-4 py-3">File Name</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Size</th>
-                <th className="px-4 py-3">Upload Date</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-center">File Name</th>
+                <th className="px-4 py-3 text-center">Type</th>
+                <th className="px-4 py-3 text-center">Size</th>
+                <th className="px-4 py-3 text-center">Upload Date</th>
+                <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {mockDocs.map((doc, idx) => (
                 <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-slate-800 flex items-center">
+                  <td className="px-4 py-3 font-medium text-slate-800 flex items-center justify-center text-center">
                     <svg className="w-5 h-5 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                     {doc.name}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{doc.type}</td>
-                  <td className="px-4 py-3 text-slate-600">{doc.size}</td>
-                  <td className="px-4 py-3 text-slate-600">{doc.date}</td>
-                  <td className="px-4 py-3 text-right">
-                    <button className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm mr-3">Download</button>
+                  <td className="px-4 py-3 text-slate-600 text-center">{doc.type}</td>
+                  <td className="px-4 py-3 text-slate-600 text-center">{doc.size}</td>
+                  <td className="px-4 py-3 text-slate-600 text-center">{doc.date}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button className="text-brand-primary hover:text-brand-primary-dark font-medium text-sm">Download</button>
                   </td>
                 </tr>
               ))}

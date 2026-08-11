@@ -281,19 +281,19 @@ export default function AddHawkerPage() {
                    <table className="w-full text-sm text-left">
                        <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
                            <tr>
-                               <th className="px-4 py-3">Document Type</th>
-                               <th className="px-4 py-3">File Name</th>
-                               <th className="px-4 py-3">Size</th>
-                               <th className="px-4 py-3 text-right">Actions</th>
+                               <th className="px-4 py-3 text-center">Document Type</th>
+                               <th className="px-4 py-3 text-center">File Name</th>
+                               <th className="px-4 py-3 text-center">Size</th>
+                               <th className="px-4 py-3 text-center">Actions</th>
                            </tr>
                        </thead>
                        <tbody className="divide-y divide-slate-200">
                            {pendingDocuments.map((doc, i) => (
                                <tr key={i} className="hover:bg-slate-50/50">
-                                   <td className="px-4 py-3 font-medium text-slate-800">{doc.docTypeName}</td>
-                                   <td className="px-4 py-3 text-slate-600 truncate max-w-[200px]">{doc.file.name}</td>
-                                   <td className="px-4 py-3 text-slate-500">{(doc.file.size / 1024 / 1024).toFixed(2)} MB</td>
-                                   <td className="px-4 py-3 text-right">
+                                   <td className="px-4 py-3 font-medium text-slate-800 text-center">{doc.docTypeName}</td>
+                                   <td className="px-4 py-3 text-slate-600 truncate max-w-[200px] text-center">{doc.file.name}</td>
+                                   <td className="px-4 py-3 text-slate-500 text-center">{(doc.file.size / 1024 / 1024).toFixed(2)} MB</td>
+                                   <td className="px-4 py-3 text-center">
                                        <button 
                                            type="button" 
                                            onClick={() => removePendingDocument(i)}

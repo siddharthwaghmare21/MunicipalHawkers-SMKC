@@ -76,11 +76,11 @@ export default async function AuditLogsPage(props: {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">Timestamp</th>
-                  <th className="px-4 py-3">User</th>
-                  <th className="px-4 py-3">Action</th>
-                  <th className="px-4 py-3">Entity</th>
-                  <th className="px-4 py-3">Details</th>
+                  <th className="px-4 py-3 text-center">Timestamp</th>
+                  <th className="px-4 py-3 text-center">User</th>
+                  <th className="px-4 py-3 text-center">Action</th>
+                  <th className="px-4 py-3 text-center">Entity</th>
+                  <th className="px-4 py-3 text-center">Details</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,21 +90,21 @@ export default async function AuditLogsPage(props: {
                   </tr>
                 ) : items.map((log: AuditLog) => (
                   <tr key={log.id} className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap text-center">
                       {new Date(log.timestamp).toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">
+                    <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap text-center">
                       {log.username || 'System'} {log.userId && <span className="text-xs text-slate-400 font-normal ml-1">(ID: {log.userId})</span>}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 whitespace-nowrap text-center">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-brand-primary-dark">
                         {log.action}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap text-center">
                       {log.entityName} {log.entityId && <span className="text-slate-400">#{log.entityId}</span>}
                     </td>
-                    <td className="px-4 py-3 text-slate-600 break-words max-w-sm">
+                    <td className="px-4 py-3 text-slate-600 break-words max-w-sm text-center">
                       {log.details}
                     </td>
                   </tr>
