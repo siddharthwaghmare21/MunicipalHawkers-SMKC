@@ -9,7 +9,9 @@ import HawkerDocuments from '@/components/hawkers/HawkerDocuments';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No' },
+  { name: 'aadharNo', label: 'Aadhar No' },
   { name: 'fullName', label: 'Full Name' },
+  { name: 'fatherHusbandName', label: 'Father / Husband Name' },
   { name: 'address', label: 'Address' },
   { name: 'gender', label: 'Gender' },
   { name: 'dob', label: 'Date of Birth', type: 'date' },
@@ -80,12 +82,6 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
           {hawker?.status !== 'Rejected' && (
             <RejectButton entityId={id} entityType="hawkers" />
           )}
-          <Link
-            href={`/licenses/add?hawkerId=${id}`}
-            className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm"
-          >
-            Issue New License
-          </Link>
           <Link
             href={`/hawkers/${id}/edit`}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"

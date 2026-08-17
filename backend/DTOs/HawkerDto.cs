@@ -8,6 +8,8 @@ namespace backend.DTOs
         public int Id { get; set; }
         public string? EnrollmentNo { get; set; }
         public string FullName { get; set; } = string.Empty;
+        public string? FatherHusbandName { get; set; }
+        public string? AadharNo { get; set; }
         public string? Address { get; set; }
         public string? Gender { get; set; }
         public DateTime? DOB { get; set; }
@@ -40,6 +42,14 @@ namespace backend.DTOs
         [Required(ErrorMessage = "Full Name is required.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Full Name must be between 3 and 100 characters.")]
         public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Father / Husband Name is required.")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Father / Husband Name must be between 3 and 100 characters.")]
+        public string? FatherHusbandName { get; set; }
+
+        [Required(ErrorMessage = "Aadhar Number is required.")]
+        [RegularExpression(@"^\d{12}$", ErrorMessage = "Aadhar Number must be exactly 12 digits.")]
+        public string? AadharNo { get; set; }
 
         [Required(ErrorMessage = "Address is required.")]
         [StringLength(500)]

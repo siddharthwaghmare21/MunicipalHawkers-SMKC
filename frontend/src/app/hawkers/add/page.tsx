@@ -7,7 +7,9 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No', type: 'text', required: true },
+  { name: 'aadharNo', label: 'Aadhar No', type: 'text', required: true },
   { name: 'fullName', label: 'Full Name', type: 'text', required: true },
+  { name: 'fatherHusbandName', label: 'Father / Husband Name', type: 'text', required: true },
   { name: 'address', label: 'Address', type: 'text', required: true },
   { name: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female', 'Other'], required: true },
   { name: 'dob', label: 'Date of Birth', type: 'date', required: true },

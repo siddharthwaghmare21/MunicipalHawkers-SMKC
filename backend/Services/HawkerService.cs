@@ -84,7 +84,9 @@ namespace backend.Services
             var hawker = new Hawker
             {
                 EnrollmentNo = dto.EnrollmentNo,
+                AadharNo = dto.AadharNo,
                 FullName = dto.FullName,
+                FatherHusbandName = dto.FatherHusbandName,
                 Address = dto.Address,
                 Gender = dto.Gender,
                 DOB = dto.DOB,
@@ -142,7 +144,9 @@ namespace backend.Services
             if (hawker == null) return null;
 
             hawker.EnrollmentNo = dto.EnrollmentNo;
+            hawker.AadharNo = dto.AadharNo;
             hawker.FullName = dto.FullName;
+            hawker.FatherHusbandName = dto.FatherHusbandName;
             hawker.Address = dto.Address;
             hawker.Gender = dto.Gender;
             hawker.DOB = dto.DOB;
@@ -301,7 +305,9 @@ namespace backend.Services
             {
                 Id = hawker.Id,
                 EnrollmentNo = hawker.EnrollmentNo,
+                AadharNo = hawker.AadharNo,
                 FullName = hawker.FullName,
+                FatherHusbandName = hawker.FatherHusbandName,
                 Address = hawker.Address,
                 Gender = hawker.Gender,
                 DOB = hawker.DOB,
