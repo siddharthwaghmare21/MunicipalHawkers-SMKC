@@ -20,7 +20,9 @@ namespace backend.Services
 
         public async Task<PaginatedResult<HawkerDto>> GetAllHawkersAsync(string? searchQuery = null, string? zoneFilter = null, string? statusFilter = null, int page = 1, int pageSize = 10)
         {
-            var query = _context.Hawkers.AsQueryable();
+            var query = _context.Hawkers
+                .Include(h => h.Licenses)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
@@ -40,11 +42,7 @@ namespace backend.Services
                 var lowerStatus = statusFilter.ToLower();
                 query = query.Where(h => h.Status.ToLower() == lowerStatus);
             }
-            else if (statusFilter != "All")
-            {
-                // Default to showing only Active hawkers if status filter is not specified or not "All"
-                query = query.Where(h => h.Status == "APPROVED");
-            }
+            // Removed default filtering to APPROVED so 'All Statuses' actually shows all hawkers
 
             var totalCount = await query.CountAsync();
             
@@ -65,7 +63,20 @@ namespace backend.Services
 
         public async Task<HawkerDto?> GetHawkerByIdAsync(int id)
         {
-            var hawker = await _context.Hawkers.FindAsync(id);
+            var hawker = await _context.Hawkers
+                .Include(h => h.Licenses)
+                .Include(h => h.Documents).ThenInclude(d => d.DocumentType)
+                .FirstOrDefaultAsync(h => h.Id == id);
+            if (hawker == null) return null;
+            return MapToDto(hawker);
+        }
+
+        public async Task<HawkerDto?> GetHawkerByEnrollmentNoAsync(string enrollmentNo)
+        {
+            var hawker = await _context.Hawkers
+                .Include(h => h.Licenses)
+                .Include(h => h.Documents).ThenInclude(d => d.DocumentType)
+                .FirstOrDefaultAsync(h => h.EnrollmentNo == enrollmentNo);
             if (hawker == null) return null;
             return MapToDto(hawker);
         }
@@ -304,6 +315,7 @@ namespace backend.Services
             return new HawkerDto
             {
                 Id = hawker.Id,
+                ActiveLicenseId = hawker.Licenses?.OrderByDescending(l => l.IssueDate).FirstOrDefault()?.Id,
                 EnrollmentNo = hawker.EnrollmentNo,
                 AadharNo = hawker.AadharNo,
                 FullName = hawker.FullName,

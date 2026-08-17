@@ -77,15 +77,14 @@ export default function EditLicensePage({ params }: { params: Promise<{ id: stri
       });
 
       if (res.ok) {
-        router.push('/licenses');
+        router.push('/hawkers');
         router.refresh();
       } else {
-        const data = await res.json();
-        setError(data.message || 'Failed to update license');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to update license');
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
-    } finally {
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
       setLoading(false);
     }
   };
@@ -94,7 +93,7 @@ export default function EditLicensePage({ params }: { params: Promise<{ id: stri
     <div className="space-y-6">
       <Breadcrumb items={[
         { label: 'Home', href: '/dashboard' }, 
-        { label: 'Licenses', href: '/licenses' },
+        { label: 'Hawkers', href: '/hawkers' },
         { label: 'Edit License' }
       ]} />
       

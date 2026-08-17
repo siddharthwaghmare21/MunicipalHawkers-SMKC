@@ -22,19 +22,34 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-  const body = await request.json();
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const body = await request.json();
 
-  const backendRes = await fetch('http://localhost:5109/api/hawkers', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
+    const backendRes = await fetch('http://localhost:5109/api/hawkers', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
 
-  const data = await backendRes.json();
-  return NextResponse.json(data, { status: backendRes.status });
+    let data;
+    const contentType = backendRes.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await backendRes.json();
+    } else {
+      const text = await backendRes.text();
+      return NextResponse.json({ success: false, message: 'Backend returned an invalid response: ' + text.substring(0, 50) }, { status: backendRes.status || 500 });
+    }
+
+    return NextResponse.json(data, { status: backendRes.status });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: 'Could not connect to the backend server. Is it running? Details: ' + error.message },
+      { status: 503 }
+    );
+  }
 }

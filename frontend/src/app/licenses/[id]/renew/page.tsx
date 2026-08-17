@@ -95,7 +95,7 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
     <div className="space-y-6">
       <Breadcrumb items={[
         { label: 'Home', href: '/dashboard' }, 
-        { label: 'Licenses', href: '/licenses' },
+        { label: 'Hawkers', href: '/hawkers' },
         { label: 'View License', href: `/licenses/${id}` },
         { label: 'Renew' }
       ]} />

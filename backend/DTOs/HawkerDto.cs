@@ -6,6 +6,7 @@ namespace backend.DTOs
     public class HawkerDto
     {
         public int Id { get; set; }
+        public int? ActiveLicenseId { get; set; }
         public string? EnrollmentNo { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string? FatherHusbandName { get; set; }

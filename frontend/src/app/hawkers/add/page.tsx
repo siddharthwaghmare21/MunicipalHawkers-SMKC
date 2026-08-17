@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { IDCard } from '@/components/hawkers/IDCard';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No', type: 'text', required: true },
@@ -57,6 +58,10 @@ export default function AddHawkerPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string>('');
+
   // Document state
   const [pendingDocuments, setPendingDocuments] = useState<PendingDocument[]>([]);
   const [selectedDocType, setSelectedDocType] = useState<string>('');
@@ -121,8 +126,23 @@ export default function AddHawkerPage() {
     setPendingDocuments(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setDocError('');
+    setError('');
+    
+    // Create an object URL for the photo if it exists
+    const photoDoc = pendingDocuments.find(d => d.docTypeName === 'Photo');
+    if (photoDoc) {
+      setPreviewPhotoUrl(URL.createObjectURL(photoDoc.file));
+    } else {
+      setPreviewPhotoUrl('');
+    }
+    
+    setShowModal(true);
+  };
+
+  const confirmSave = async () => {
     setLoading(true);
     setError('');
 
@@ -179,12 +199,13 @@ export default function AddHawkerPage() {
         router.refresh();
       } else {
         // All good
-        router.push('/hawkers');
         router.refresh();
+        router.push('/hawkers');
       }
 
     } catch (err: any) {
       setError(err.message || 'An error occurred');
+      setShowModal(false);
       setLoading(false);
     }
   };
@@ -234,9 +255,9 @@ export default function AddHawkerPage() {
                     value={formData[field.name] || ''}
                     onChange={handleChange}
                     required={field.required}
-                    pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : field.name === 'enrollmentNo' ? '^SMKC-.*' : undefined}
-                    title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : field.name === 'enrollmentNo' ? "Enrollment Number must start with 'SMKC-'" : undefined}
-                    max={field.type === 'date' ? new Date().toISOString().split('T')[0] : undefined}
+                    pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : field.name === 'enrollmentNo' ? '^SMKC-.*' : field.name === 'aadharNo' ? '^\\d{12}$' : undefined}
+                    title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : field.name === 'enrollmentNo' ? "Enrollment Number must start with 'SMKC-'" : field.name === 'aadharNo' ? 'Aadhar Number must be exactly 12 digits' : undefined}
+                    max={field.type === 'date' && field.name !== 'licenseExpiryDate' ? new Date().toISOString().split('T')[0] : undefined}
                     className="border border-slate-300 rounded-md px-3 py-2.5 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
                   />
                 )}
@@ -338,6 +359,55 @@ export default function AddHawkerPage() {
           </div>
         </form>
       </Card>
+
+      {showModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-white">
+              <h3 className="text-xl font-bold text-slate-900" id="modal-title">
+                Review ID Card Preview
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Please verify that the details below are correct before confirming. This is a preview of the physical ID card.
+              </p>
+            </div>
+            
+            {/* Modal Body (Scrollable) */}
+            <div className="px-6 py-6 overflow-y-auto bg-slate-50 flex-1 flex flex-col items-center justify-center min-h-[300px]">
+              <div className="shadow-lg rounded-lg overflow-hidden border border-slate-200">
+                <IDCard 
+                  hawker={formData}
+                  photoUrl={previewPhotoUrl}
+                  licenseNumber="LIC-PENDING"
+                  issueDate={new Date().toISOString()}
+                  expiryDate={formData.licenseExpiryDate}
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer (Pinned) */}
+            <div className="px-6 py-4 bg-white border-t border-slate-100 flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3">
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => setShowModal(false)}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200 transition-colors"
+              >
+                Cancel & Edit
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={confirmSave}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors disabled:opacity-50 flex items-center justify-center"
+              >
+                {loading ? 'Generating...' : 'Confirm & Generate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

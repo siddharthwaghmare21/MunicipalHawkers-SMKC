@@ -66,7 +66,7 @@ export default async function ViewLicensePage({ params }: { params: Promise<{ id
     <div className="space-y-6">
       <Breadcrumb items={[
         { label: 'Home', href: '/dashboard' }, 
-        { label: 'Licenses', href: '/licenses' },
+        { label: 'Hawkers', href: '/hawkers' },
         { label: 'View License' }
       ]} />
       
@@ -89,7 +89,7 @@ export default async function ViewLicensePage({ params }: { params: Promise<{ id
             Edit License
           </Link>
           <Link
-            href="/licenses"
+            href="/hawkers"
             className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors text-sm font-medium"
           >
             Back to List

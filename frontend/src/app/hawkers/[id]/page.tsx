@@ -6,6 +6,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { RejectButton } from '@/components/RejectButton';
 import { Badge } from '@/components/Badge';
 import HawkerDocuments from '@/components/hawkers/HawkerDocuments';
+import { IDCardActions } from '@/components/hawkers/IDCardActions';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No' },
@@ -78,7 +79,8 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
       
       <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
         <h1 className="text-2xl font-bold text-slate-800">Hawker Details</h1>
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap gap-3">
+          <IDCardActions hawker={hawker} />
           {hawker?.status !== 'Rejected' && (
             <RejectButton entityId={id} entityType="hawkers" />
           )}

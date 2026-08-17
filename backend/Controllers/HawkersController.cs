@@ -46,6 +46,22 @@ namespace backend.Controllers
             return Ok(ApiResponse<PaginatedResult<RenewedHawkerReportDto>>.Ok(result));
         }
 
+        [HttpGet("public/{enrollmentNo}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker(string enrollmentNo)
+        {
+            var hawker = await _hawkerService.GetHawkerByEnrollmentNoAsync(enrollmentNo);
+            if (hawker == null)
+            {
+                return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with Enrollment Number {enrollmentNo} not found."));
+            }
+
+            // Since this is a public verification endpoint, return the hawker data.
+            // The user requested ALL information including Aadhar Number to be visible.
+            return Ok(ApiResponse<HawkerDto>.Ok(hawker, "Hawker retrieved successfully"));
+        }
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> GetHawker(int id)
         {

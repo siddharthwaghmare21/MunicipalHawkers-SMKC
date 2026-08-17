@@ -5,6 +5,9 @@ import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { Badge } from '@/components/Badge';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function HawkersPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
@@ -146,10 +149,17 @@ export default async function HawkersPage(props: {
                       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Edit</span>
                     </Link>
 
-                    <Link href={`/licenses/${hawker.id}/renew`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
-                      <span>🔄</span>
-                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Renew</span>
-                    </Link>
+                    {hawker.activeLicenseId ? (
+                      <Link href={`/licenses/${hawker.activeLicenseId}/renew`} className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0">
+                        <span>🔄</span>
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Renew</span>
+                      </Link>
+                    ) : (
+                      <div className="relative group text-lg grayscale opacity-50 cursor-not-allowed">
+                        <span>🔄</span>
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">No License</span>
+                      </div>
+                    )}
                     <button className="relative group text-lg hover:scale-110 transition-transform grayscale hover:grayscale-0 cursor-pointer">
                       <span>❌</span>
                       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">Reject</span>

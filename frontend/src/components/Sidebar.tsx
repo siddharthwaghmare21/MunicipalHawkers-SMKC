@@ -9,8 +9,6 @@ export function Sidebar({ isOpen, toggleSidebar }: { isOpen: boolean, toggleSide
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: 'speedometer2' },
     { label: 'Hawkers', href: '/hawkers', icon: 'people' },
-    { label: 'Licenses', href: '/licenses', icon: 'card-checklist' },
-    { label: 'Documents', href: '/documents', icon: 'folder2-open' },
     { label: 'Reports', href: '/reports', icon: 'bar-chart' },
     { label: 'Audit Logs', href: '/audit-logs', icon: 'journal-text' },
   ];
