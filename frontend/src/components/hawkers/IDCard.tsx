@@ -153,7 +153,7 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
         {hawker.enrollmentNo && (
           <div style={{ position: 'absolute', bottom: '2mm', right: '35mm', zIndex: 10, backgroundColor: 'white', padding: '1px' }}>
             <QRCodeSVG 
-              value={`http://localhost:3000/verify/${hawker.enrollmentNo}`} 
+              value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/verify/${hawker.enrollmentNo}`} 
               size={45} 
               level="M" 
               includeMargin={false}
