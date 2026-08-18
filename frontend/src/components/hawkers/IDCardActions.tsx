@@ -9,14 +9,32 @@ export function IDCardActions({ hawker }: { hawker: any }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [photoUrl, setPhotoUrl] = useState<string>('');
 
-  // Find the photo document from hawker's documents if it exists
   useEffect(() => {
-    if (hawker?.documents) {
-      const photoDoc = hawker.documents.find((d: any) => d.documentType?.name === 'Photo');
-      if (photoDoc) {
-        setPhotoUrl(`http://localhost:5109${photoDoc.filePath}`);
+    const fetchPhoto = async () => {
+      let docs = hawker?.documents;
+      
+      // If documents aren't included in the hawker payload, fetch them
+      if (!docs && hawker?.id) {
+        try {
+          const res = await fetch(`/api/documents/hawker/${hawker.id}`);
+          if (res.ok) {
+            const json = await res.json();
+            docs = json.data || (Array.isArray(json) ? json : []);
+          }
+        } catch (e) {
+          console.error("Failed to fetch documents for photo", e);
+        }
       }
-    }
+
+      if (docs && Array.isArray(docs)) {
+        const photoDoc = docs.find((d: any) => d.documentType?.name === 'Photo' || d.documentTypeName === 'Photo');
+        if (photoDoc) {
+          setPhotoUrl(`http://localhost:5109${photoDoc.filePath}`);
+        }
+      }
+    };
+
+    fetchPhoto();
   }, [hawker]);
 
   const handlePrint = () => {
