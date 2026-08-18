@@ -7,6 +7,7 @@ import { RejectButton } from '@/components/RejectButton';
 import { Badge } from '@/components/Badge';
 import HawkerDocuments from '@/components/hawkers/HawkerDocuments';
 import { IDCardActions } from '@/components/hawkers/IDCardActions';
+import { HawkerQRCode } from '@/components/hawkers/HawkerQRCode';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No' },
@@ -119,18 +120,25 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
               </div>
             </div>
           )}
-          <Card>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {HAWKER_FIELDS.map((field) => (
-              <div key={field.name} className="flex flex-col space-y-1 pb-4 border-b border-slate-100 last:border-0 md:border-0">
-                <span className="text-sm font-medium text-slate-500">{field.label}</span>
-                <span className="text-slate-800 font-medium">
-                  {formatValue(hawker[field.name], field.type)}
-                </span>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3">
+              <Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {HAWKER_FIELDS.map((field) => (
+                    <div key={field.name} className="flex flex-col space-y-1 pb-4 border-b border-slate-100 last:border-0 md:border-0">
+                      <span className="text-sm font-medium text-slate-500">{field.label}</span>
+                      <span className="text-slate-800 font-medium">
+                        {formatValue(hawker[field.name], field.type)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+            <div className="lg:col-span-1">
+              <HawkerQRCode enrollmentNo={hawker.enrollmentNo} />
+            </div>
           </div>
-          </Card>
           <div className="mt-8">
             <h2 className="text-xl font-bold text-slate-800 mb-4">Documents</h2>
             <HawkerDocuments hawkerId={id} isITAdmin={true} isDeptAdmin={true} hideUploadForm={true} />
