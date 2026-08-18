@@ -31,8 +31,9 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
             setLoading(true);
             const res = await fetch(`/api/documents/hawker/${hawkerId}`);
             if (!res.ok) throw new Error("Failed to fetch documents");
-            const data = await res.json();
-            setDocuments(data);
+            const json = await res.json();
+            const docsArray = json.data ? json.data : (Array.isArray(json) ? json : []);
+            setDocuments(docsArray);
         } catch (err) {
             setError(err.message);
         } finally {
