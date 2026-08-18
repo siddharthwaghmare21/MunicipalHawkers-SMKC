@@ -2,8 +2,15 @@
 
 import { useState, useEffect } from "react";
 
-export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hideUploadForm = false }) {
-    const [documents, setDocuments] = useState([]);
+interface HawkerDocumentsProps {
+    hawkerId: string | number;
+    isITAdmin: boolean;
+    isDeptAdmin: boolean;
+    hideUploadForm?: boolean;
+}
+
+export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hideUploadForm = false }: HawkerDocumentsProps) {
+    const [documents, setDocuments] = useState<any[]>([]);
     const [documentTypes, setDocumentTypes] = useState([
         { id: 1, name: "Aadhar Card" },
         { id: 2, name: "Photo" },
@@ -14,15 +21,15 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
     
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+    const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const [selectedDocType, setSelectedDocType] = useState("");
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     
     // Verification state
     const [verifyModalOpen, setVerifyModalOpen] = useState(false);
-    const [verifyDocId, setVerifyDocId] = useState(null);
+    const [verifyDocId, setVerifyDocId] = useState<number | null>(null);
     const [verifyStatus, setVerifyStatus] = useState("Verified");
     const [verifyRemarks, setVerifyRemarks] = useState("");
 
@@ -34,7 +41,7 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
             const json = await res.json();
             const docsArray = json.data ? json.data : (Array.isArray(json) ? json : []);
             setDocuments(docsArray);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
@@ -47,11 +54,11 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
         }
     }, [hawkerId]);
 
-    const handleFileChange = (e) => {
+    const handleFileChange = (e: any) => {
         setSelectedFile(e.target.files[0]);
     };
 
-    const handleUpload = async (e) => {
+    const handleUpload = async (e: any) => {
         e.preventDefault();
         if (!selectedDocType || !selectedFile) {
             setError("Please select a document type and file.");
@@ -74,7 +81,7 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
             setError(null);
             
             const formData = new FormData();
-            formData.append("HawkerId", hawkerId);
+            formData.append("HawkerId", hawkerId.toString());
             formData.append("DocumentTypeId", selectedDocType);
             formData.append("File", selectedFile);
 
@@ -92,18 +99,18 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
             setSelectedFile(null);
             setSelectedDocType("");
             // Reset file input
-            document.getElementById("fileInput").value = "";
+            (document.getElementById("fileInput") as HTMLInputElement).value = "";
             fetchDocuments();
             
             setTimeout(() => setSuccessMessage(null), 3000);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message);
         } finally {
             setUploading(false);
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this document?")) return;
 
         try {
@@ -116,24 +123,24 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
                 throw new Error(data.message || "Failed to delete");
             }
             fetchDocuments();
-        } catch (err) {
+        } catch (err: any) {
             alert(err.message);
         }
     };
     
-    const handleDownload = (id, filename) => {
+    const handleDownload = (id: number, filename: string) => {
         // Redirecting to download endpoint to let browser handle the download response
         window.open(`/api/documents/download/${id}`, "_blank");
     };
 
-    const openVerifyModal = (docId) => {
+    const openVerifyModal = (docId: number) => {
         setVerifyDocId(docId);
         setVerifyStatus("Verified");
         setVerifyRemarks("");
         setVerifyModalOpen(true);
     };
 
-    const handleVerify = async (e) => {
+    const handleVerify = async (e: any) => {
         e.preventDefault();
         try {
             const res = await fetch(`/api/documents/${verifyDocId}/verify`, {
@@ -154,7 +161,7 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
             fetchDocuments();
             setSuccessMessage("Document verification updated.");
             setTimeout(() => setSuccessMessage(null), 3000);
-        } catch (err) {
+        } catch (err: any) {
             alert(err.message);
         }
     };
@@ -323,7 +330,7 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
                                 <textarea 
                                     className="w-full border rounded-md p-2 focus:ring-2 focus:ring-brand-primary"
-                                    rows="3"
+                                    rows={3}
                                     value={verifyRemarks}
                                     onChange={(e) => setVerifyRemarks(e.target.value)}
                                     placeholder="Enter remarks or reason for rejection..."
