@@ -133,6 +133,25 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
         window.open(`/api/documents/download/${id}`, "_blank");
     };
 
+    const handleQuickApprove = async (docId: number) => {
+        try {
+            const res = await fetch(`/api/documents/${docId}/verify`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    status: "Verified",
+                    remarks: ""
+                })
+            });
+            if (!res.ok) throw new Error("Verification failed");
+            fetchDocuments();
+            setSuccessMessage("Document approved.");
+            setTimeout(() => setSuccessMessage(null), 3000);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     const openVerifyModal = (docId: number) => {
         setVerifyDocId(docId);
         setVerifyStatus("Verified");
@@ -283,12 +302,28 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
                                             
                                             {canManage && (
                                                 <>
+                                                    {doc.status !== 'Verified' && (
+                                                        <>
+                                                            <span className="text-gray-300">|</span>
+                                                            <button 
+                                                                onClick={() => handleQuickApprove(doc.id)}
+                                                                className="text-emerald-600 hover:text-emerald-900 font-medium"
+                                                                title="Instantly Approve"
+                                                            >
+                                                                Approve
+                                                            </button>
+                                                        </>
+                                                    )}
                                                     <span className="text-gray-300">|</span>
                                                     <button 
-                                                        onClick={() => openVerifyModal(doc.id)}
-                                                        className="text-brand-primary hover:text-indigo-900"
+                                                        onClick={() => {
+                                                            openVerifyModal(doc.id);
+                                                            // We can just rely on the modal for rejecting
+                                                        }}
+                                                        className="text-amber-600 hover:text-amber-900"
+                                                        title="Review / Reject"
                                                     >
-                                                        Verify
+                                                        Review
                                                     </button>
                                                     <span className="text-gray-300">|</span>
                                                     <button 
