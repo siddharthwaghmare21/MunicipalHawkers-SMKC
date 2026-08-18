@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin }) {
+export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hideUploadForm = false }) {
     const [documents, setDocuments] = useState([]);
     const [documentTypes, setDocumentTypes] = useState([
         { id: 1, name: "Aadhar Card" },
@@ -169,7 +169,7 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin }) {
             {successMessage && <div className="bg-green-50 text-green-600 p-3 rounded-md">{successMessage}</div>}
             
             {/* Upload Section */}
-            {canManage && (
+            {canManage && !hideUploadForm && (
                 <div className="bg-white border rounded-lg p-4 shadow-sm">
                     <h3 className="text-lg font-semibold mb-4 text-gray-800">Upload New Document</h3>
                     <form onSubmit={handleUpload} className="flex flex-col md:flex-row gap-4 items-end">

@@ -133,7 +133,7 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
           </Card>
           <div className="mt-8">
             <h2 className="text-xl font-bold text-slate-800 mb-4">Documents</h2>
-            <HawkerDocuments hawkerId={id} isITAdmin={true} isDeptAdmin={true} />
+            <HawkerDocuments hawkerId={id} isITAdmin={true} isDeptAdmin={true} hideUploadForm={true} />
           </div>
         </>
       ) : (
