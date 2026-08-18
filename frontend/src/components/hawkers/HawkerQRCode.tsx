@@ -7,8 +7,8 @@ export function HawkerQRCode({ enrollmentNo }: { enrollmentNo: string }) {
   if (!enrollmentNo) return null;
 
   const verifyUrl = typeof window !== 'undefined' 
-    ? ${window.location.origin}/verify/ 
-    : http://localhost:3000/verify/;
+    ? `${window.location.origin}/verify/${enrollmentNo}` 
+    : `http://localhost:3000/verify/${enrollmentNo}`;
 
   return (
     <div className="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
