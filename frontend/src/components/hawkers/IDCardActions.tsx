@@ -29,7 +29,8 @@ export function IDCardActions({ hawker }: { hawker: any }) {
       if (docs && Array.isArray(docs)) {
         const photoDoc = docs.find((d: any) => d.documentType?.name === 'Photo' || d.documentTypeName === 'Photo');
         if (photoDoc) {
-          setPhotoUrl(`http://localhost:5109${photoDoc.filePath}`);
+          // Use the proxy download endpoint since filePath is not exposed in DocumentDto
+          setPhotoUrl(`/api/documents/download/${photoDoc.id}`);
         }
       }
     };
