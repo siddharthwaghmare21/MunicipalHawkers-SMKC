@@ -4,6 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import HawkerDocuments from '@/components/hawkers/HawkerDocuments';
 
 const HAWKER_FIELDS = [
   { name: 'enrollmentNo', label: 'Enrollment No', type: 'text', required: true },
@@ -178,6 +179,13 @@ export default function EditHawkerPage({ params }: { params: Promise<{ id: strin
           </form>
         )}
       </Card>
+      
+      {!loading && (
+        <div className="mt-8">
+          <h2 className="text-xl font-bold text-slate-800 mb-4">Documents</h2>
+          <HawkerDocuments hawkerId={id} isITAdmin={true} isDeptAdmin={true} />
+        </div>
+      )}
     </div>
   );
 }

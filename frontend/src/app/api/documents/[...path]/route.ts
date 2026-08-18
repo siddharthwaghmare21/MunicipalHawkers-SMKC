@@ -45,11 +45,9 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
         };
 
         if (method !== "GET" && method !== "HEAD") {
-            // If it's multipart/form-data, pass the raw request body stream directly
+            // If it's multipart/form-data, parse it and pass it so fetch handles the boundary
             if (contentType?.includes("multipart/form-data")) {
-                options.body = req.body;
-                // @ts-ignore
-                options.duplex = 'half';
+                options.body = await req.formData();
             } else {
                 // Otherwise try to get text payload
                 const bodyText = await req.text();
