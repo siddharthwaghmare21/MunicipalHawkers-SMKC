@@ -20,4 +20,6 @@ COPY --from=build /app/publish .
 # Run the application. 
 # Render automatically injects the $PORT environment variable.
 # ASPNETCORE_URLS instructs .NET to listen on that dynamic port.
+# Use polling file watcher to avoid inotify limits on Render/Linux.
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet backend.dll
