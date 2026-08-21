@@ -20,7 +20,10 @@ export async function POST(request: Request) {
 
     if (!backendRes.ok) {
         const errorData = await backendRes.json().catch(() => ({}));
-        return NextResponse.json({ error: errorData.message || 'Invalid credentials' }, { status: 401 });
+        return NextResponse.json(
+            { error: errorData.message || `Backend error: ${backendRes.status} ${backendRes.statusText}` }, 
+            { status: backendRes.status }
+        );
     }
 
     const responseData = await backendRes.json();
