@@ -46,7 +46,8 @@ namespace backend.Middleware
             { 
                 success = false, 
                 message = message,
-                // Do not expose exception.Message by default for 500 errors to prevent leaking DB details
+                debug_error = exception.Message,
+                debug_stack = exception.StackTrace
             });
             
             return context.Response.WriteAsync(result);
