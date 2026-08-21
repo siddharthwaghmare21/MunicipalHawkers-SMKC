@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
-  const backendRes = await fetch(`http://localhost:5109/api/licenses?${searchParams.toString()}`, {
+  const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/licenses?${searchParams.toString()}`, {
     headers: {
       'Authorization': `Bearer ${token}`
     },
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   const token = cookieStore.get('token')?.value;
   const body = await request.json();
 
-  const backendRes = await fetch('http://localhost:5109/api/licenses', {
+  const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/licenses`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,

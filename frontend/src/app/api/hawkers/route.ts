@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
-  const backendRes = await fetch(`http://localhost:5109/api/hawkers?${searchParams.toString()}`, {
+  const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers?${searchParams.toString()}`, {
     headers: {
       'Authorization': `Bearer ${token}`
     },
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const token = cookieStore.get('token')?.value;
     const body = await request.json();
 
-    const backendRes = await fetch('http://localhost:5109/api/hawkers', {
+    const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -29,7 +29,7 @@ export function RejectButton({
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] || '';
       
-      const res = await fetch(`http://localhost:5109/api/${entityType}/${entityId}/reject`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/${entityType}/${entityId}/reject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -27,7 +27,7 @@ export default async function LicensesPage(props: {
   let totalCount = 0;
 
   try {
-    const res = await fetch(`http://localhost:5109/api/licenses?${queryParams}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/licenses?${queryParams}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

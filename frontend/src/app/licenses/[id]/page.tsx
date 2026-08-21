@@ -16,7 +16,7 @@ export default async function ViewLicensePage({ params }: { params: Promise<{ id
   let error = '';
 
   try {
-    const res = await fetch(`http://localhost:5109/api/licenses/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/licenses/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       },
@@ -32,7 +32,7 @@ export default async function ViewLicensePage({ params }: { params: Promise<{ id
       error = 'Failed to fetch license details';
     }
 
-    const renewalsRes = await fetch(`http://localhost:5109/api/renewals/license/${id}`, {
+    const renewalsRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/renewals/license/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       },

@@ -5,7 +5,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ lice
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
-  const backendRes = await fetch(`http://localhost:5109/api/renewals/license/${(await params).licenseId}`, {
+  const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/renewals/license/${(await params).licenseId}`, {
     headers: {
       'Authorization': `Bearer ${token}`
     },

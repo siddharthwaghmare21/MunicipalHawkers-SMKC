@@ -30,7 +30,7 @@ export default async function HawkersPage(props: {
   let data = { items: [], totalCount: 0, page: 1, pageSize: 10 };
   
   try {
-    const res = await fetch(`http://localhost:5109/api/hawkers?${queryParams.toString()}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers?${queryParams.toString()}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       },

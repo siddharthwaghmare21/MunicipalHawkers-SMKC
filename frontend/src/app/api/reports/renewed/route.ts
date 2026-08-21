@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const queryString = searchParams.toString();
 
   try {
-    const response = await fetch(`http://localhost:5109/api/hawkers/report/renewed?${queryString}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers/report/renewed?${queryString}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

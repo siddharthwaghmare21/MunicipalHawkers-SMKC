@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 async function getPublicHawker(enrollmentNo: string) {
   try {
-    const res = await fetch(`http://localhost:5109/api/hawkers/public/${enrollmentNo}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers/public/${enrollmentNo}`, {
       cache: 'no-store'
     });
     
@@ -32,7 +32,7 @@ export default async function VerifyHawkerPage({ params }: { params: { enrollmen
   
   const license = hawker.licenses && hawker.licenses.length > 0 ? hawker.licenses[0] : null;
   const photoDoc = hawker.documents?.find((d: any) => d.documentType?.name === 'Photo');
-  const photoUrl = photoDoc ? `http://localhost:5109${photoDoc.filePath}` : null;
+  const photoUrl = photoDoc ? `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}${photoDoc.filePath}` : null;
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col items-center p-4 sm:p-8 font-sans">

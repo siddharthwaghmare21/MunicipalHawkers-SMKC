@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     }
 
     // Call the .NET backend
-    const backendRes = await fetch('http://localhost:5109/api/auth/login', {
+    const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

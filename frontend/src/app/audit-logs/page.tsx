@@ -33,7 +33,7 @@ export default async function AuditLogsPage(props: {
   let errorMsg = '';
   
   try {
-    const res = await fetch(`http://localhost:5109/api/auditlogs?${queryParams.toString()}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/auditlogs?${queryParams.toString()}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       },

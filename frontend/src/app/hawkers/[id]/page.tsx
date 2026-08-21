@@ -39,7 +39,7 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
   let error = '';
 
   try {
-    const res = await fetch(`http://localhost:5109/api/hawkers/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       },

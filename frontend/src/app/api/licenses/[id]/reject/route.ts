@@ -6,7 +6,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const token = cookieStore.get('token')?.value;
   const body = await request.json();
 
-  const backendRes = await fetch(`http://localhost:5109/api/licenses/${(await params).id}/reject`, {
+  const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/licenses/${(await params).id}/reject`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
