@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const SECRET_KEY = new TextEncoder().encode('super_secret_key_which_should_be_long_enough_12345!');
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || 'super_secret_key_which_should_be_long_enough_12345!');
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
