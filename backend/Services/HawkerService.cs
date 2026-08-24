@@ -73,10 +73,12 @@ namespace backend.Services
 
         public async Task<HawkerDto?> GetHawkerByEnrollmentNoAsync(string enrollmentNo)
         {
+            if (string.IsNullOrWhiteSpace(enrollmentNo)) return null;
+            var cleanNo = enrollmentNo.Trim().ToLower();
             var hawker = await _context.Hawkers
                 .Include(h => h.Licenses)
                 .Include(h => h.Documents).ThenInclude(d => d.DocumentType)
-                .FirstOrDefaultAsync(h => h.EnrollmentNo == enrollmentNo);
+                .FirstOrDefaultAsync(h => h.EnrollmentNo != null && h.EnrollmentNo.ToLower() == cleanNo);
             if (hawker == null) return null;
             return MapToDto(hawker);
         }
@@ -88,14 +90,15 @@ namespace backend.Services
 
             if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
             {
-                var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo == dto.EnrollmentNo);
+                var cleanEnrollment = dto.EnrollmentNo.Trim().ToLower();
+                var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo != null && h.EnrollmentNo.ToLower() == cleanEnrollment);
                 if (existing != null)
                     throw new System.InvalidOperationException($"A hawker with Enrollment Number '{dto.EnrollmentNo}' already exists.");
             }
             var hawker = new Hawker
             {
-                EnrollmentNo = dto.EnrollmentNo,
-                AadharNo = dto.AadharNo,
+                EnrollmentNo = dto.EnrollmentNo?.Trim(),
+                AadharNo = dto.AadharNo?.Trim(),
                 FullName = dto.FullName,
                 FatherHusbandName = dto.FatherHusbandName,
                 Address = dto.Address,
@@ -105,6 +108,13 @@ namespace backend.Services
                 Handicap = dto.Handicap,
                 ULBName = dto.ULBName,
                 WardName = dto.WardName,
+                RoadName = dto.RoadName,
+                LandMark = dto.LandMark,
+                AreaType = dto.AreaType,
+                BusinessType = dto.BusinessType,
+                BusinessTime = dto.BusinessTime,
+                LocationType = dto.LocationType,
+                PartnerDependancy = dto.PartnerDependancy,
                 Status = "DRAFT",
                 RejectionReason = null,
                 Remarks = null,

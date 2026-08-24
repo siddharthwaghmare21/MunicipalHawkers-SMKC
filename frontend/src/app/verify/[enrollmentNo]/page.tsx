@@ -4,24 +4,28 @@ import Image from 'next/image';
 
 async function getPublicHawker(enrollmentNo: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}/api/hawkers/public/${enrollmentNo}`, {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109';
+    const res = await fetch(`${backendUrl}/api/hawkers/public/${encodeURIComponent(enrollmentNo)}`, {
       cache: 'no-store'
     });
     
     if (!res.ok) {
+      console.error(`Failed to fetch public hawker ${enrollmentNo}: HTTP ${res.status}`);
       return null;
     }
     
     const data = await res.json();
-    return data.data;
+    return data.data || data;
   } catch (error) {
     console.error("Error fetching public hawker data:", error);
     return null;
   }
 }
 
-export default async function VerifyHawkerPage({ params }: { params: { enrollmentNo: string } }) {
-  const hawker = await getPublicHawker(params.enrollmentNo);
+export default async function VerifyHawkerPage({ params }: { params: Promise<{ enrollmentNo: string }> }) {
+  const resolvedParams = await params;
+  const enrollmentNo = resolvedParams?.enrollmentNo ? decodeURIComponent(resolvedParams.enrollmentNo) : '';
+  const hawker = enrollmentNo ? await getPublicHawker(enrollmentNo) : null;
 
   if (!hawker) {
     notFound();
