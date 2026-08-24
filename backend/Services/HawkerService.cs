@@ -105,13 +105,11 @@ namespace backend.Services
                 Handicap = dto.Handicap,
                 ULBName = dto.ULBName,
                 WardName = dto.WardName,
-                RoadName = dto.RoadName,
-                LandMark = dto.LandMark,
-                AreaType = dto.AreaType,
-                BusinessType = dto.BusinessType,
-                BusinessTime = dto.BusinessTime,
-                LocationType = dto.LocationType,
-                PartnerDependancy = dto.PartnerDependancy
+                Status = "DRAFT",
+                RejectionReason = null,
+                Remarks = null,
+                RejectedBy = null,
+                RejectedDate = null
             };
 
             _context.Hawkers.Add(hawker);

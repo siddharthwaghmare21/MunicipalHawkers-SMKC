@@ -2,6 +2,8 @@ using backend.DTOs;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace backend.Controllers
@@ -12,10 +14,12 @@ namespace backend.Controllers
     public class HawkersController : ControllerBase
     {
         private readonly IHawkerService _hawkerService;
+        private readonly ILogger<HawkersController> _logger;
 
-        public HawkersController(IHawkerService hawkerService)
+        public HawkersController(IHawkerService hawkerService, ILogger<HawkersController> logger)
         {
             _hawkerService = hawkerService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -74,14 +78,33 @@ namespace backend.Controllers
             return Ok(ApiResponse<HawkerDto>.Ok(hawker, "Hawker retrieved successfully"));
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> CreateHawker([FromBody] CreateHawkerDto dto)
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             int? userId = int.TryParse(userIdClaim, out var uid) ? uid : null;
+            try
+            {
+                var hawker = await _hawkerService.CreateHawkerAsync(dto, userId);
+                return CreatedAtAction(nameof(GetHawker), new { id = hawker.Id }, ApiResponse<HawkerDto>.Ok(hawker, "Hawker created successfully"));
+            }
+            catch (System.InvalidOperationException ex)
+            {
+                return BadRequest(ApiResponse<HawkerDto>.Error(ex.Message));
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger?.LogError(dbEx, "Database update error in CreateHawker");
+                var innerMsg = dbEx.InnerException?.Message ?? dbEx.Message;
+                return StatusCode(500, ApiResponse<HawkerDto>.Error($"Database error: {innerMsg}"));
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Unexpected error in CreateHawker");
+                return StatusCode(500, ApiResponse<HawkerDto>.Error("An unexpected error occurred while creating the hawker."));
+            }
 
-            var hawker = await _hawkerService.CreateHawkerAsync(dto, userId);
-            return CreatedAtAction(nameof(GetHawker), new { id = hawker.Id }, ApiResponse<HawkerDto>.Ok(hawker, "Hawker created successfully"));
         }
 
         [HttpPut("{id}")]

@@ -29,6 +29,10 @@ namespace backend.Middleware
 
         private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            Console.WriteLine("=== EXCEPTION CAUGHT BY MIDDLEWARE ===");
+            Console.WriteLine(exception.ToString());
+            Console.WriteLine("======================================");
+
             context.Response.ContentType = "application/json";
 
             var statusCode = (int)HttpStatusCode.InternalServerError;

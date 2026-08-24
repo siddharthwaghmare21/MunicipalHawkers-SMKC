@@ -151,6 +151,7 @@ export default function AddHawkerPage() {
       const res = await fetch('/api/hawkers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           ...formData,
           handicap: formData.handicap === 'Yes'
