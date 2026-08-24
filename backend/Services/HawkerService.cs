@@ -389,9 +389,9 @@ namespace backend.Services
                     OriginalFileName = d.OriginalFileName ?? string.Empty,
                     ContentType = d.ContentType ?? string.Empty,
                     FileSize = d.FileSize,
-                    Status = d.VerificationStatus,
+                    Status = d.Status,
                     Remarks = d.Remarks,
-                    UploadDate = d.UploadedAt
+                    UploadDate = d.UploadDate
                 }).ToList() ?? new()
             };
         }
