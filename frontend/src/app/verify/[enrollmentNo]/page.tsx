@@ -35,7 +35,10 @@ export default async function VerifyHawkerPage({ params }: { params: Promise<{ e
   const safeDate = (val: any) => val ? new Date(val).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'}) : '-';
   
   const license = hawker.licenses && hawker.licenses.length > 0 ? hawker.licenses[0] : null;
-  const photoDoc = hawker.documents?.find((d: any) => d.documentType?.name === 'Photo');
+  const photoDoc = hawker.documents?.find((d: any) => {
+    const name = d.documentType?.name?.toLowerCase() || '';
+    return name.includes('photo') || name.includes('image') || d.contentType?.startsWith('image/');
+  });
   const photoUrl = photoDoc ? `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}${photoDoc.filePath}` : null;
 
   return (

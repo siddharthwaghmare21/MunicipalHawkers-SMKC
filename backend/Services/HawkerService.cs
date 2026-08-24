@@ -88,16 +88,36 @@ namespace backend.Services
             if (dto.DOB.HasValue && dto.DOB.Value > System.DateTime.UtcNow)
                 throw new System.InvalidOperationException("Date of Birth cannot be in the future.");
 
-            if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
+            var now = System.DateTime.UtcNow;
+            var randomPart = new System.Random().Next(100000, 999999);
+            var autoUniqueId = $"{randomPart}/{now:yyyy}/{now:ddMM}";
+
+            var finalEnrollmentNo = !string.IsNullOrWhiteSpace(dto.EnrollmentNo) 
+                ? dto.EnrollmentNo.Trim() 
+                : autoUniqueId;
+
+            if (!string.IsNullOrWhiteSpace(finalEnrollmentNo))
             {
-                var cleanEnrollment = dto.EnrollmentNo.Trim().ToLower();
+                var cleanEnrollment = finalEnrollmentNo.ToLower();
                 var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo != null && h.EnrollmentNo.ToLower() == cleanEnrollment);
                 if (existing != null)
-                    throw new System.InvalidOperationException($"A hawker with Enrollment Number '{dto.EnrollmentNo}' already exists.");
+                {
+                    // If auto-generated conflicted, re-generate with new random
+                    if (string.IsNullOrWhiteSpace(dto.EnrollmentNo))
+                    {
+                        randomPart = new System.Random().Next(100000, 999999);
+                        finalEnrollmentNo = $"{randomPart}/{now:yyyy}/{now:ddMM}";
+                    }
+                    else
+                    {
+                        throw new System.InvalidOperationException($"A hawker with Enrollment/Unique ID '{dto.EnrollmentNo}' already exists.");
+                    }
+                }
             }
+
             var hawker = new Hawker
             {
-                EnrollmentNo = dto.EnrollmentNo?.Trim(),
+                EnrollmentNo = finalEnrollmentNo,
                 AadharNo = dto.AadharNo?.Trim(),
                 FullName = dto.FullName,
                 FatherHusbandName = dto.FatherHusbandName,
@@ -125,15 +145,14 @@ namespace backend.Services
             _context.Hawkers.Add(hawker);
             await _context.SaveChangesAsync();
 
-            var monthYear = System.DateTime.UtcNow.ToString("MMMM-yyyy");
-            var licenseNo = $"LIC-{hawker.EnrollmentNo}-{monthYear}";
-            var defaultExpiry = new System.DateTime(System.DateTime.UtcNow.Year + 5, System.DateTime.UtcNow.Month, 1).AddMonths(1).AddDays(-1);
+            var licenseNo = hawker.EnrollmentNo ?? autoUniqueId;
+            var defaultExpiry = new System.DateTime(now.Year + 5, now.Month, 1).AddMonths(1).AddDays(-1);
 
             var license = new License
             {
                 HawkerId = hawker.Id,
                 LicenseNumber = licenseNo,
-                IssueDate = System.DateTime.UtcNow,
+                IssueDate = now,
                 ExpiryDate = dto.LicenseExpiryDate ?? defaultExpiry,
                 LicenseType = "Standard",
                 Status = "APPROVED"

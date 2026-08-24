@@ -35,8 +35,6 @@ namespace backend.DTOs
 
     public class CreateHawkerDto
     {
-        [Required(ErrorMessage = "Enrollment Number is required.")]
-        [RegularExpression(@"^SMKC-.*", ErrorMessage = "Enrollment Number must start with 'SMKC-'.")]
         [StringLength(50)]
         public string? EnrollmentNo { get; set; }
 

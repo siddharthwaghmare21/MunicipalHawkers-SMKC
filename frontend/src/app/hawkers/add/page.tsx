@@ -7,7 +7,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { IDCard } from '@/components/hawkers/IDCard';
 
 const HAWKER_FIELDS = [
-  { name: 'enrollmentNo', label: 'Enrollment No', type: 'text', required: true },
+  { name: 'enrollmentNo', label: 'Unique ID / License No', type: 'text', required: true },
   { name: 'aadharNo', label: 'Aadhar No', type: 'text', required: true },
   { name: 'fullName', label: 'Full Name', type: 'text', required: true },
   { name: 'fatherHusbandName', label: 'Father / Husband Name', type: 'text', required: true },
@@ -27,6 +27,15 @@ const HAWKER_FIELDS = [
   { name: 'partnerDependancy', label: 'Partner Dependancy', type: 'text', required: true },
   { name: 'licenseExpiryDate', label: 'License Expiry Date', type: 'date', required: true }
 ];
+
+const generateUniqueId = () => {
+  const randomNum = Math.floor(100000 + Math.random() * 900000);
+  const now = new Date();
+  const year = now.getFullYear();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${randomNum}/${year}/${day}${month}`;
+};
 
 const getDefaultExpiryDate = () => {
   const date = new Date();
@@ -51,6 +60,7 @@ interface PendingDocument {
 export default function AddHawkerPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<Record<string, string>>({
+    enrollmentNo: generateUniqueId(),
     gender: 'Male',
     handicap: 'No',
     licenseExpiryDate: getDefaultExpiryDate()
@@ -282,8 +292,8 @@ export default function AddHawkerPage() {
                     value={formData[field.name] || ''}
                     onChange={handleChange}
                     required={field.required}
-                    pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : field.name === 'enrollmentNo' ? '^SMKC-.*' : field.name === 'aadharNo' ? '^\\d{12}$' : undefined}
-                    title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : field.name === 'enrollmentNo' ? "Enrollment Number must start with 'SMKC-'" : field.name === 'aadharNo' ? 'Aadhar Number must be exactly 12 digits' : undefined}
+                    pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : field.name === 'aadharNo' ? '^\\d{12}$' : undefined}
+                    title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : field.name === 'aadharNo' ? 'Aadhar Number must be exactly 12 digits' : undefined}
                     max={field.type === 'date' && field.name !== 'licenseExpiryDate' ? new Date().toISOString().split('T')[0] : undefined}
                     className="border border-slate-300 rounded-md px-3 py-2.5 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
                   />
