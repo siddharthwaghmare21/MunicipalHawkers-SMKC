@@ -55,18 +55,18 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
 
         const response = await fetch(url, options);
         
-        const contentType = response.headers.get("content-type") || "";
+        const resContentType = response.headers.get("content-type") || "";
         const contentDisposition = response.headers.get("content-disposition");
-        const isBinary = contentType.startsWith("image/") || 
-                         contentType.startsWith("application/pdf") || 
-                         contentType.startsWith("application/octet-stream") || 
+        const isBinary = resContentType.startsWith("image/") || 
+                         resContentType.startsWith("application/pdf") || 
+                         resContentType.startsWith("application/octet-stream") || 
                          Boolean(contentDisposition) ||
                          path.startsWith("download");
 
         if (isBinary) {
             const buffer = await response.arrayBuffer();
             const headers: Record<string, string> = {
-                "Content-Type": contentType || "application/octet-stream",
+                "Content-Type": resContentType || "application/octet-stream",
             };
             if (contentDisposition) {
                 headers["Content-Disposition"] = contentDisposition;
@@ -82,7 +82,7 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
         return new NextResponse(data, {
             status: response.status,
             headers: {
-                "Content-Type": contentType || "application/json",
+                "Content-Type": resContentType || "application/json",
             },
         });
     } catch (error: any) {
