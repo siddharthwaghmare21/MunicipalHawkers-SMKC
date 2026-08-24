@@ -28,6 +28,13 @@ namespace backend.Services
             }
         }
 
+        public async Task<IEnumerable<object>> GetDocumentTypesAsync()
+        {
+            return await _context.DocumentTypes
+                .Select(dt => new { dt.Id, dt.Name, dt.Description })
+                .ToListAsync();
+        }
+
         public async Task<DocumentDto> UploadDocumentAsync(UploadDocumentDto uploadDto, int? uploadedByUserId)
         {
             var hawker = await _context.Hawkers.FindAsync(uploadDto.HawkerId);

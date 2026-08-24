@@ -7,6 +7,7 @@ namespace backend.Services
 {
     public interface IDocumentService
     {
+        Task<IEnumerable<object>> GetDocumentTypesAsync();
         Task<DocumentDto> UploadDocumentAsync(UploadDocumentDto uploadDto, int? uploadedByUserId);
         Task<IEnumerable<DocumentDto>> GetDocumentsByHawkerIdAsync(int hawkerId);
         Task<(byte[] FileBytes, string ContentType, string FileName)> DownloadDocumentAsync(int documentId);

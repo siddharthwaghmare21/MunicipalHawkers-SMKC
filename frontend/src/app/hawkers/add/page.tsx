@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
@@ -55,6 +55,13 @@ export default function AddHawkerPage() {
     handicap: 'No',
     licenseExpiryDate: getDefaultExpiryDate()
   });
+  const [documentTypes, setDocumentTypes] = useState<Array<{ id: number; name: string }>>([
+    { id: 1, name: "Aadhar Card" },
+    { id: 2, name: "Photo" },
+    { id: 3, name: "PAN Card" },
+    { id: 4, name: "Voter ID" },
+    { id: 5, name: "Ration Card" }
+  ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -67,6 +74,24 @@ export default function AddHawkerPage() {
   const [selectedDocType, setSelectedDocType] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [docError, setDocError] = useState<string>('');
+
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      try {
+        const res = await fetch('/api/documents/types');
+        if (res.ok) {
+          const json = await res.json();
+          const list = json.data || (Array.isArray(json) ? json : []);
+          if (Array.isArray(list) && list.length > 0) {
+            setDocumentTypes(list);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch doc types", e);
+      }
+    };
+    fetchDocTypes();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -97,7 +122,7 @@ export default function AddHawkerPage() {
       return;
     }
 
-    const docTypeInfo = DOCUMENT_TYPES.find(d => d.id === parseInt(selectedDocType));
+    const docTypeInfo = documentTypes.find(d => d.id === parseInt(selectedDocType));
     if (!docTypeInfo) return;
 
     // Check if doc type already added
@@ -118,11 +143,9 @@ export default function AddHawkerPage() {
     // Reset selection
     setSelectedDocType('');
     setSelectedFile(null);
-    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    if (fileInput) fileInput.value = '';
   };
 
-  const removePendingDocument = (index: number) => {
+  const handleRemoveDocument = (index: number) => {
     setPendingDocuments(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -132,7 +155,10 @@ export default function AddHawkerPage() {
     setError('');
     
     // Create an object URL for the photo if it exists
-    const photoDoc = pendingDocuments.find(d => d.docTypeName === 'Photo');
+    const photoDoc = pendingDocuments.find(d => {
+      const name = d.docTypeName.toLowerCase();
+      return name.includes('photo') || name.includes('image') || d.file.type.startsWith('image/');
+    });
     if (photoDoc) {
       setPreviewPhotoUrl(URL.createObjectURL(photoDoc.file));
     } else {
@@ -284,7 +310,7 @@ export default function AddHawkerPage() {
                         className="border border-slate-300 rounded-md px-3 py-2.5 outline-none focus:ring-2 focus:ring-red-500 text-sm"
                     >
                         <option value="">Select Document</option>
-                        {DOCUMENT_TYPES.map((type) => (
+                        {documentTypes.map((type) => (
                             <option key={type.id} value={type.id}>{type.name}</option>
                         ))}
                     </select>
@@ -328,7 +354,7 @@ export default function AddHawkerPage() {
                                    <td className="px-4 py-3 text-center">
                                        <button 
                                            type="button" 
-                                           onClick={() => removePendingDocument(i)}
+                                           onClick={() => handleRemoveDocument(i)}
                                            className="text-red-600 hover:text-red-800 font-medium"
                                        >
                                            Remove

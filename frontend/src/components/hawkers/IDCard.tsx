@@ -138,15 +138,15 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
           </div>
         </div>
 
-        {/* Commissioner Signature */}
+        {/* Deputy Commissioner Signature */}
         <div style={{ position: 'absolute', bottom: '2mm', left: '5mm', fontSize: '6.5px', fontWeight: 'bold', color: '#1e293b', zIndex: 10 }}>
-          <div style={{ width: '15mm', height: '6mm', borderBottom: '1px solid #94a3b8', marginBottom: '1px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div style={{ width: '18mm', height: '6mm', borderBottom: '1px solid #94a3b8', marginBottom: '1px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
             {/* Signature scribble placeholder */}
-            <svg viewBox="0 0 100 40" style={{ width: '12mm', height: '5mm', opacity: 0.4 }}>
+            <svg viewBox="0 0 100 40" style={{ width: '14mm', height: '5mm', opacity: 0.4 }}>
               <path d="M10,25 C20,10 30,30 40,20 C50,10 60,35 70,15 C80,-5 90,30 95,20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </div>
-          Commissioner S.M.K.C.C
+          Deputy Commissioner S.M.K.C.C
         </div>
 
         {/* QR Code */}

@@ -20,6 +20,21 @@ namespace backend.Controllers
             _documentService = documentService;
         }
 
+        [HttpGet("types")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDocumentTypes()
+        {
+            try
+            {
+                var types = await _documentService.GetDocumentTypesAsync();
+                return Ok(ApiResponse<IEnumerable<object>>.Ok(types, "Document types retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<object>.Error(ex.Message));
+            }
+        }
+
         [HttpPost("upload")]
         [AllowAnonymous]
         public async Task<IActionResult> UploadDocument([FromForm] UploadDocumentDto uploadDto)

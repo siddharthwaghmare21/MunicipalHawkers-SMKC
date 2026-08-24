@@ -49,6 +49,22 @@ export default function HawkerDocuments({ hawkerId, isITAdmin, isDeptAdmin, hide
     };
 
     useEffect(() => {
+        const fetchDocTypes = async () => {
+            try {
+                const res = await fetch('/api/documents/types');
+                if (res.ok) {
+                    const json = await res.json();
+                    const list = json.data || (Array.isArray(json) ? json : []);
+                    if (Array.isArray(list) && list.length > 0) {
+                        setDocumentTypes(list);
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch doc types", e);
+            }
+        };
+
+        fetchDocTypes();
         if (hawkerId) {
             fetchDocuments();
         }
