@@ -10,6 +10,7 @@ export function IDCardActions({ hawker }: { hawker: any }) {
   const [photoUrl, setPhotoUrl] = useState<string>('');
 
   useEffect(() => {
+    let isMounted = true;
     const fetchPhoto = async () => {
       let docs = hawker?.documents;
       
@@ -29,39 +30,61 @@ export function IDCardActions({ hawker }: { hawker: any }) {
       if (docs && Array.isArray(docs)) {
         const photoDoc = docs.find((d: any) => d.documentType?.name === 'Photo' || d.documentTypeName === 'Photo');
         if (photoDoc) {
-          // Use the proxy download endpoint since filePath is not exposed in DocumentDto
-          setPhotoUrl(`/api/documents/download/${photoDoc.id}`);
+          try {
+            const imgRes = await fetch(`/api/documents/download/${photoDoc.id}`);
+            if (imgRes.ok) {
+              const blob = await imgRes.blob();
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                if (isMounted && typeof reader.result === 'string') {
+                  setPhotoUrl(reader.result);
+                }
+              };
+              reader.readAsDataURL(blob);
+            }
+          } catch (err) {
+            console.error("Error loading photo data url:", err);
+          }
         }
       }
     };
 
     fetchPhoto();
+    return () => { isMounted = false; };
   }, [hawker]);
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (printWindow && cardRef.current) {
-      // Need to capture the styles and HTML
       const html = cardRef.current.outerHTML;
       printWindow.document.write(`
+        <!DOCTYPE html>
         <html>
           <head>
             <title>Print ID Card</title>
-            <script src="https://cdn.tailwindcss.com"></script>
             <style>
               @media print {
                 @page { size: auto; margin: 0; }
                 body { margin: 1cm; display: flex; justify-content: center; }
+              }
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #f8fafc;
               }
             </style>
           </head>
           <body>
             ${html}
             <script>
-              setTimeout(() => {
-                window.print();
-                window.close();
-              }, 500);
+              window.onload = () => {
+                setTimeout(() => {
+                  window.print();
+                }, 300);
+              };
             </script>
           </body>
         </html>

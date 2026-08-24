@@ -28,7 +28,7 @@ namespace backend.Services
             }
         }
 
-        public async Task<DocumentDto> UploadDocumentAsync(UploadDocumentDto uploadDto, int uploadedByUserId)
+        public async Task<DocumentDto> UploadDocumentAsync(UploadDocumentDto uploadDto, int? uploadedByUserId)
         {
             var hawker = await _context.Hawkers.FindAsync(uploadDto.HawkerId);
             if (hawker == null) throw new Exception("Hawker not found");

@@ -21,14 +21,13 @@ namespace backend.Controllers
         }
 
         [HttpPost("upload")]
-        [Authorize(Roles = "IT_ADMIN,DEPARTMENT_ADMIN")]
+        [AllowAnonymous]
         public async Task<IActionResult> UploadDocument([FromForm] UploadDocumentDto uploadDto)
         {
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdClaim, out int userId))
-                    return Unauthorized("User ID not found in token");
+                int? userId = int.TryParse(userIdClaim, out int uid) ? uid : null;
                     
                 var result = await _documentService.UploadDocumentAsync(uploadDto, userId);
                 return Ok(ApiResponse<DocumentDto>.Ok(result, "Document uploaded successfully"));
@@ -40,6 +39,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("hawker/{hawkerId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetDocumentsByHawkerId(int hawkerId)
         {
             try
@@ -54,6 +54,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("download/{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> DownloadDocument(int id)
         {
             try
