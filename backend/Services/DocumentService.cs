@@ -52,22 +52,24 @@ namespace backend.Services
             if (uploadDto.File.Length > 5 * 1024 * 1024) // 5MB limit for now
                 throw new Exception("File size exceeds 5MB limit");
 
-            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(uploadDto.File.FileName)}";
-            var filePath = Path.Combine(_uploadDirectory, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
             {
-                await uploadDto.File.CopyToAsync(stream);
+                await uploadDto.File.CopyToAsync(ms);
+                fileBytes = ms.ToArray();
             }
+
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(uploadDto.File.FileName)}";
 
             var document = new Document
             {
                 HawkerId = uploadDto.HawkerId,
                 DocumentTypeId = uploadDto.DocumentTypeId,
-                FilePath = uniqueFileName, // Only store filename, not absolute path
+                FilePath = uniqueFileName, // Keep for backward compatibility
                 OriginalFileName = uploadDto.File.FileName,
                 ContentType = uploadDto.File.ContentType,
                 FileSize = uploadDto.File.Length,
+                FileData = fileBytes,
                 UploadDate = DateTime.UtcNow,
                 Status = "UNDER_REVIEW"
             };
@@ -95,6 +97,11 @@ namespace backend.Services
         {
             var document = await _context.Documents.FindAsync(documentId);
             if (document == null) throw new Exception("Document not found");
+
+            if (document.FileData != null && document.FileData.Length > 0)
+            {
+                return (document.FileData, document.ContentType, document.OriginalFileName);
+            }
 
             var filePath = Path.Combine(_uploadDirectory, document.FilePath);
             if (!File.Exists(filePath)) throw new Exception("File not found on server");
