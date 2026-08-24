@@ -40,8 +40,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden">
         <div className="bg-red-600 px-6 py-8 text-center">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-red-600 font-bold text-3xl mx-auto mb-4">
-            S
+          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center p-1 mx-auto mb-3 shadow-md">
+            <img src="/smkc-logo.png" alt="SMKC Logo" className="w-full h-full object-contain rounded-full" />
           </div>
           <h1 className="text-2xl font-bold text-white">MunicipalHawkers</h1>
           <p className="text-red-100 text-sm mt-1">SMKC ERP System</p>

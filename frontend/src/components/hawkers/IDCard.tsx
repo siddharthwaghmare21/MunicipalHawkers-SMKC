@@ -62,11 +62,13 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
               <span style={{ fontSize: '4.5px', color: '#475569', display: 'block', lineHeight: '1.2' }}>Deendayal Antyodaya Yojana-<br/>National Urban Livelihoods Mission</span>
             </div>
           </div>
-          {/* Logo Placeholder */}
-          <div style={{ width: '12mm', height: '12mm', border: '1px solid #dc2626', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: '4px' }}>
-            <div style={{ width: '10mm', height: '10mm', border: '1px solid #ef4444', backgroundColor: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: '5px', color: '#dc2626', fontWeight: 'bold' }}>SMKC</span>
-            </div>
+          {/* Official SMKC Emblem Logo */}
+          <div style={{ width: '13mm', height: '13mm', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: '4px' }}>
+            <img 
+              src="/smkc-logo.png" 
+              alt="SMKC Emblem" 
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+            />
           </div>
         </div>
 
