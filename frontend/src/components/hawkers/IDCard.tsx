@@ -13,10 +13,23 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
   const safeStr = (val: any) => (val ? String(val) : '-');
   
   // Format Date: DD-MMM-YYYY (e.g., 29-Aug-1978)
-  const formatAbbrDate = (val: any) => {
-    if (!val) return '-';
-    const d = new Date(val);
-    if (isNaN(d.getTime())) return String(val);
+  const formatAbbrDate = (val: any, isExpiryFallback = false) => {
+    if (!val && !isExpiryFallback) return '-';
+    let d: Date;
+    if (val) {
+      d = new Date(val);
+      if (isNaN(d.getTime())) {
+        if (isExpiryFallback) {
+          const now = new Date();
+          d = new Date(now.getFullYear() + 5, now.getMonth() + 1, 0);
+        } else {
+          return String(val);
+        }
+      }
+    } else {
+      const now = new Date();
+      d = new Date(now.getFullYear() + 5, now.getMonth() + 1, 0);
+    }
     const day = String(d.getDate()).padStart(2, '0');
     const month = d.toLocaleString('en-US', { month: 'short' });
     const year = d.getFullYear();
@@ -33,7 +46,28 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
 
   const uniqueId = licenseNumber && licenseNumber !== 'LIC-PENDING' 
     ? licenseNumber 
-    : (hawker?.enrollmentNo || '-');
+    : (hawker?.activeLicenseNumber || hawker?.enrollmentNo || '-');
+
+  const resolvedPhotoUrl = photoUrl || hawker?.photoUrl || (() => {
+    const docs = hawker?.documents;
+    if (Array.isArray(docs)) {
+      const photoDoc = docs.find((d: any) => {
+        const typeName = (d.documentType?.name || d.documentTypeName || '').toLowerCase();
+        const fileName = (d.originalFileName || d.fileName || '').toLowerCase();
+        const contentType = (d.contentType || '').toLowerCase();
+        const isImage = contentType.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(fileName);
+        return typeName.includes('photo') || typeName.includes('image') || isImage;
+      });
+      if (photoDoc) {
+        if (photoDoc.filePath) {
+          const backend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+          return photoDoc.filePath.startsWith('http') ? photoDoc.filePath : `${backend}${photoDoc.filePath}`;
+        }
+        return `/api/documents/download/${photoDoc.id}`;
+      }
+    }
+    return '';
+  })();
 
   return (
     <div 
@@ -136,7 +170,7 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
             </div>
             <div style={{ display: 'flex', marginTop: '0.5px' }}>
               <span style={{ fontWeight: 'bold', width: '22mm' }}>Valid Upto</span>
-              <span style={{ fontWeight: 'bold' }}>: {formatAbbrDate(expiryDate)}</span>
+              <span style={{ fontWeight: 'bold' }}>: {formatAbbrDate(expiryDate || hawker?.licenseExpiryDate || hawker?.expiryDate || hawker?.licenses?.[0]?.expiryDate, true)}</span>
             </div>
           </div>
 
@@ -144,8 +178,8 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
           <div style={{ width: '19mm', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '1px', zIndex: 10, flexShrink: 0 }}>
             {/* Photo Box */}
             <div style={{ width: '17mm', height: '21mm', backgroundColor: '#e2e8f0', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '2px', borderRadius: '2px' }}>
-              {photoUrl ? (
-                <img src={photoUrl} alt="Hawker" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+              {resolvedPhotoUrl ? (
+                <img src={resolvedPhotoUrl} alt="Hawker" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
               ) : (
                 <span style={{ fontSize: '6px', color: '#64748b' }}>Photo</span>
               )}

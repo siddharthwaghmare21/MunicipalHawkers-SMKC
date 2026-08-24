@@ -339,10 +339,13 @@ namespace backend.Services
 
         private static HawkerDto MapToDto(Hawker hawker)
         {
+            var activeLicense = hawker.Licenses?.OrderByDescending(l => l.IssueDate).FirstOrDefault();
             return new HawkerDto
             {
                 Id = hawker.Id,
-                ActiveLicenseId = hawker.Licenses?.OrderByDescending(l => l.IssueDate).FirstOrDefault()?.Id,
+                ActiveLicenseId = activeLicense?.Id,
+                ActiveLicenseNumber = activeLicense?.LicenseNumber,
+                LicenseExpiryDate = activeLicense?.ExpiryDate,
                 EnrollmentNo = hawker.EnrollmentNo,
                 AadharNo = hawker.AadharNo,
                 FullName = hawker.FullName,
@@ -365,7 +368,31 @@ namespace backend.Services
                 RejectionReason = hawker.RejectionReason,
                 Remarks = hawker.Remarks,
                 RejectedBy = hawker.RejectedBy?.Username,
-                RejectedDate = hawker.RejectedDate
+                RejectedDate = hawker.RejectedDate,
+                Licenses = hawker.Licenses?.Select(l => new LicenseDto
+                {
+                    Id = l.Id,
+                    HawkerId = l.HawkerId,
+                    LicenseNumber = l.LicenseNumber,
+                    IssueDate = l.IssueDate,
+                    ExpiryDate = l.ExpiryDate,
+                    Status = l.Status,
+                    LicenseType = l.LicenseType,
+                    Remarks = l.Remarks
+                }).ToList() ?? new(),
+                Documents = hawker.Documents?.Select(d => new DocumentDto
+                {
+                    Id = d.Id,
+                    HawkerId = d.HawkerId,
+                    DocumentTypeId = d.DocumentTypeId,
+                    DocumentTypeName = d.DocumentType?.Name ?? "Document",
+                    OriginalFileName = d.OriginalFileName ?? string.Empty,
+                    ContentType = d.ContentType ?? string.Empty,
+                    FileSize = d.FileSize,
+                    Status = d.VerificationStatus,
+                    Remarks = d.Remarks,
+                    UploadDate = d.UploadedAt
+                }).ToList() ?? new()
             };
         }
     }

@@ -14,8 +14,8 @@ export function IDCardActions({ hawker }: { hawker: any }) {
     const fetchPhoto = async () => {
       let docs = hawker?.documents;
       
-      // If documents aren't included in the hawker payload, fetch them
-      if (!docs && hawker?.id) {
+      // Always fetch latest documents if list is empty or documents property missing
+      if ((!docs || docs.length === 0) && hawker?.id) {
         try {
           const res = await fetch(`/api/documents/hawker/${hawker.id}`);
           if (res.ok) {
@@ -28,7 +28,14 @@ export function IDCardActions({ hawker }: { hawker: any }) {
       }
 
       if (docs && Array.isArray(docs)) {
-        const photoDoc = docs.find((d: any) => d.documentType?.name === 'Photo' || d.documentTypeName === 'Photo');
+        const photoDoc = docs.find((d: any) => {
+          const typeName = (d.documentType?.name || d.documentTypeName || '').toLowerCase();
+          const fileName = (d.originalFileName || d.fileName || '').toLowerCase();
+          const contentType = (d.contentType || '').toLowerCase();
+          const isImage = contentType.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(fileName);
+          return typeName.includes('photo') || typeName.includes('image') || isImage;
+        });
+
         if (photoDoc) {
           try {
             const imgRes = await fetch(`/api/documents/download/${photoDoc.id}`);
@@ -41,9 +48,14 @@ export function IDCardActions({ hawker }: { hawker: any }) {
                 }
               };
               reader.readAsDataURL(blob);
+            } else if (photoDoc.filePath) {
+              setPhotoUrl(photoDoc.filePath);
             }
           } catch (err) {
             console.error("Error loading photo data url:", err);
+            if (photoDoc.filePath) {
+              setPhotoUrl(photoDoc.filePath);
+            }
           }
         }
       }
@@ -118,8 +130,10 @@ export function IDCardActions({ hawker }: { hawker: any }) {
     }
   };
 
-  // We need to fetch the license info. We can assume the first license.
   const license = hawker?.licenses && hawker.licenses.length > 0 ? hawker.licenses[0] : null;
+  const expiryDate = license?.expiryDate || hawker?.licenseExpiryDate || hawker?.expiryDate;
+  const issueDate = license?.issueDate || hawker?.issueDate || hawker?.createdDate;
+  const licenseNumber = license?.licenseNumber || hawker?.activeLicenseNumber || hawker?.enrollmentNo;
 
   return (
     <>
@@ -146,9 +160,9 @@ export function IDCardActions({ hawker }: { hawker: any }) {
           ref={cardRef}
           hawker={hawker}
           photoUrl={photoUrl}
-          licenseNumber={license?.licenseNumber}
-          issueDate={license?.issueDate}
-          expiryDate={license?.expiryDate}
+          licenseNumber={licenseNumber}
+          issueDate={issueDate}
+          expiryDate={expiryDate}
         />
       </div>
     </>
