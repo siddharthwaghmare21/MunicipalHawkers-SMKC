@@ -33,9 +33,8 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
             headers.set("Authorization", `Bearer ${token}`);
         }
 
-        // Only set Content-Type if it's not a FormData upload
         const contentType = req.headers.get("content-type");
-        if (contentType && !contentType.includes("multipart/form-data")) {
+        if (contentType) {
             headers.set("Content-Type", contentType);
         }
 
@@ -45,15 +44,9 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
         };
 
         if (method !== "GET" && method !== "HEAD") {
-            // If it's multipart/form-data, parse it and pass it so fetch handles the boundary
-            if (contentType?.includes("multipart/form-data")) {
-                options.body = await req.formData();
-            } else {
-                // Otherwise try to get text payload
-                const bodyText = await req.text();
-                if (bodyText) {
-                    options.body = bodyText;
-                }
+            const bodyBuffer = await req.arrayBuffer();
+            if (bodyBuffer.byteLength > 0) {
+                options.body = Buffer.from(bodyBuffer);
             }
         }
 
@@ -62,14 +55,25 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
 
         const response = await fetch(url, options);
         
-        // Handle file downloads
-        if (response.headers.get("content-disposition")) {
-            return new NextResponse(response.body, {
+        const contentType = response.headers.get("content-type") || "";
+        const contentDisposition = response.headers.get("content-disposition");
+        const isBinary = contentType.startsWith("image/") || 
+                         contentType.startsWith("application/pdf") || 
+                         contentType.startsWith("application/octet-stream") || 
+                         Boolean(contentDisposition) ||
+                         path.startsWith("download");
+
+        if (isBinary) {
+            const buffer = await response.arrayBuffer();
+            const headers: Record<string, string> = {
+                "Content-Type": contentType || "application/octet-stream",
+            };
+            if (contentDisposition) {
+                headers["Content-Disposition"] = contentDisposition;
+            }
+            return new NextResponse(buffer, {
                 status: response.status,
-                headers: {
-                    "Content-Disposition": response.headers.get("content-disposition") || "",
-                    "Content-Type": response.headers.get("content-type") || "application/octet-stream",
-                },
+                headers,
             });
         }
         
@@ -78,7 +82,7 @@ async function proxyRequest(req: NextRequest, path: string, method: string) {
         return new NextResponse(data, {
             status: response.status,
             headers: {
-                "Content-Type": response.headers.get("content-type") || "application/json",
+                "Content-Type": contentType || "application/json",
             },
         });
     } catch (error: any) {

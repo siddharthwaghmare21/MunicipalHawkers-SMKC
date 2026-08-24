@@ -8,132 +8,151 @@ import { jsPDF } from 'jspdf';
 export function IDCardActions({ hawker }: { hawker: any }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [photoUrl, setPhotoUrl] = useState<string>('');
+  const [resolvedLicense, setResolvedLicense] = useState<any>(null);
+
+  const fetchPhotoAndLicense = async () => {
+    let docs = hawker?.documents;
+    
+    // Always fetch latest documents if list is empty or documents property missing
+    if ((!docs || docs.length === 0) && hawker?.id) {
+      try {
+        const res = await fetch(`/api/documents/hawker/${hawker.id}`);
+        if (res.ok) {
+          const json = await res.json();
+          docs = json.data || (Array.isArray(json) ? json : []);
+        }
+      } catch (e) {
+        console.error("Failed to fetch documents for photo", e);
+      }
+    }
+
+    if (docs && Array.isArray(docs)) {
+      const photoDoc = docs.find((d: any) => {
+        const typeName = (d.documentType?.name || d.documentTypeName || '').toLowerCase();
+        const fileName = (d.originalFileName || d.fileName || '').toLowerCase();
+        const contentType = (d.contentType || '').toLowerCase();
+        const isImage = contentType.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(fileName);
+        return typeName.includes('photo') || typeName.includes('image') || isImage;
+      });
+
+      if (photoDoc) {
+        try {
+          const imgRes = await fetch(`/api/documents/download/${photoDoc.id}`);
+          if (imgRes.ok) {
+            const blob = await imgRes.blob();
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              if (typeof reader.result === 'string') {
+                setPhotoUrl(reader.result);
+              }
+            };
+            reader.readAsDataURL(blob);
+          } else if (photoDoc.filePath) {
+            setPhotoUrl(photoDoc.filePath);
+          }
+        } catch (err) {
+          console.error("Error loading photo data url:", err);
+          if (photoDoc.filePath) {
+            setPhotoUrl(photoDoc.filePath);
+          }
+        }
+      }
+    }
+
+    if (!hawker?.licenses?.length && !resolvedLicense && hawker?.id) {
+      try {
+        const licRes = await fetch(`/api/licenses/hawker/${hawker.id}`);
+        if (licRes.ok) {
+          const json = await licRes.json();
+          const lics = json.data || (Array.isArray(json) ? json : []);
+          if (Array.isArray(lics) && lics.length > 0) {
+            setResolvedLicense(lics[0]);
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching licenses", e);
+      }
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchPhoto = async () => {
-      let docs = hawker?.documents;
-      
-      // Always fetch latest documents if list is empty or documents property missing
-      if ((!docs || docs.length === 0) && hawker?.id) {
-        try {
-          const res = await fetch(`/api/documents/hawker/${hawker.id}`);
-          if (res.ok) {
-            const json = await res.json();
-            docs = json.data || (Array.isArray(json) ? json : []);
-          }
-        } catch (e) {
-          console.error("Failed to fetch documents for photo", e);
-        }
-      }
-
-      if (docs && Array.isArray(docs)) {
-        const photoDoc = docs.find((d: any) => {
-          const typeName = (d.documentType?.name || d.documentTypeName || '').toLowerCase();
-          const fileName = (d.originalFileName || d.fileName || '').toLowerCase();
-          const contentType = (d.contentType || '').toLowerCase();
-          const isImage = contentType.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(fileName);
-          return typeName.includes('photo') || typeName.includes('image') || isImage;
-        });
-
-        if (photoDoc) {
-          try {
-            const imgRes = await fetch(`/api/documents/download/${photoDoc.id}`);
-            if (imgRes.ok) {
-              const blob = await imgRes.blob();
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                if (isMounted && typeof reader.result === 'string') {
-                  setPhotoUrl(reader.result);
-                }
-              };
-              reader.readAsDataURL(blob);
-            } else if (photoDoc.filePath) {
-              setPhotoUrl(photoDoc.filePath);
-            }
-          } catch (err) {
-            console.error("Error loading photo data url:", err);
-            if (photoDoc.filePath) {
-              setPhotoUrl(photoDoc.filePath);
-            }
-          }
-        }
-      }
-    };
-
-    fetchPhoto();
-    return () => { isMounted = false; };
+    fetchPhotoAndLicense();
   }, [hawker]);
 
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow && cardRef.current) {
-      const html = cardRef.current.outerHTML;
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Print ID Card</title>
-            <style>
-              @media print {
-                @page { size: auto; margin: 0; }
-                body { margin: 1cm; display: flex; justify-content: center; }
-              }
-              body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: #f8fafc;
-              }
-            </style>
-          </head>
-          <body>
-            ${html}
-            <script>
-              window.onload = () => {
-                setTimeout(() => {
-                  window.print();
-                }, 300);
-              };
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
+  const handlePrint = async () => {
+    await fetchPhotoAndLicense();
+    // Allow slight tick for state rendering
+    setTimeout(() => {
+      const printWindow = window.open('', '_blank');
+      if (printWindow && cardRef.current) {
+        const html = cardRef.current.outerHTML;
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Print ID Card</title>
+              <style>
+                @media print {
+                  @page { size: auto; margin: 0; }
+                  body { margin: 1cm; display: flex; justify-content: center; }
+                }
+                body {
+                  font-family: Arial, sans-serif;
+                  margin: 20px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  background-color: #f8fafc;
+                }
+              </style>
+            </head>
+            <body>
+              ${html}
+              <script>
+                window.onload = () => {
+                  setTimeout(() => {
+                    window.print();
+                  }, 300);
+                };
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+    }, 150);
   };
 
   const handleExportPDF = async () => {
     if (!cardRef.current) return;
+    await fetchPhotoAndLicense();
     
-    try {
-      const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true });
-      if (!canvas || canvas.width === 0) {
-        throw new Error('Canvas rendering failed. The element may be disconnected from the DOM.');
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(cardRef.current!, { scale: 3, useCORS: true });
+        if (!canvas || canvas.width === 0) {
+          throw new Error('Canvas rendering failed.');
+        }
+        
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: [85.6, 54]
+        });
+        
+        pdf.addImage(canvas, 'PNG', 0, 0, 85.6, 54);
+        pdf.save(`Hawker-IDCard-${hawker.enrollmentNo || hawker.id}.pdf`);
+      } catch (err) {
+        console.error('Error generating PDF:', err);
+        alert('Failed to generate PDF. Please try again.');
       }
-      
-      // CR80 dimensions in mm
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: [85.6, 54]
-      });
-      
-      // Pass the canvas directly to jsPDF to avoid PNG signature parsing errors
-      pdf.addImage(canvas, 'PNG', 0, 0, 85.6, 54);
-      pdf.save(`Hawker-IDCard-${hawker.enrollmentNo || hawker.id}.pdf`);
-    } catch (err) {
-      console.error('Error generating PDF:', err);
-      alert('Failed to generate PDF. Please try again.');
-    }
+    }, 150);
   };
 
-  const license = hawker?.licenses && hawker.licenses.length > 0 ? hawker.licenses[0] : null;
-  const expiryDate = license?.expiryDate || hawker?.licenseExpiryDate || hawker?.expiryDate;
-  const issueDate = license?.issueDate || hawker?.issueDate || hawker?.createdDate;
-  const licenseNumber = license?.licenseNumber || hawker?.activeLicenseNumber || hawker?.enrollmentNo;
+  const activeLic = resolvedLicense || (hawker?.licenses && hawker.licenses.length > 0 ? hawker.licenses[0] : null);
+  const expiryDate = activeLic?.expiryDate || hawker?.licenseExpiryDate || hawker?.expiryDate;
+  const issueDate = activeLic?.issueDate || hawker?.issueDate || hawker?.createdDate;
+  const licenseNumber = activeLic?.licenseNumber || hawker?.activeLicenseNumber || hawker?.enrollmentNo;
 
   return (
     <>
