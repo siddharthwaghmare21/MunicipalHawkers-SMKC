@@ -1,18 +1,19 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
 
 export default function ReportsPage() {
   const reportsList = [
-    { id: 'master', title: 'Master Hawker List', desc: 'Comprehensive directory of all registered and verified hawkers.' },
+    { id: 'master', title: 'Master Hawker List', desc: 'Comprehensive directory of all registered and verified hawkers.', href: '/reports/master' },
     { id: 'zone', title: 'Hawker Zone Distribution', desc: 'Analytics on hawker density across different municipal zones and wards.' },
-    { id: 'expiring', title: 'Expiring Licenses (Next 30 Days)', desc: 'List of all hawker licenses scheduled to expire shortly.' },
+    { id: 'expiring', title: 'Expiring Licenses (Next 30 Days)', desc: 'List of all hawker licenses scheduled to expire shortly.', href: '/reports/renewed' },
     { id: 'new', title: 'New Registrations', desc: 'Detailed report on new hawkers registered over the current fiscal year.' },
     { id: 'pending', title: 'Pending Approvals', desc: 'List of hawker applications and documents waiting for admin verification.' },
     { id: 'category', title: 'Vending Category Distribution', desc: 'Breakdown of what hawkers are selling (e.g., Food, Vegetables, Goods).' },
-    { id: 'audit', title: 'System Audit Logs', desc: 'Detailed logs of admin actions, approvals, and rejections for accountability.' }
+    { id: 'audit', title: 'System Audit Logs', desc: 'Detailed logs of admin actions, approvals, and rejections for accountability.', href: '/audit-logs' }
   ];
 
   const handleExport = async (reportId: string, format: string) => {
@@ -63,6 +64,15 @@ export default function ReportsPage() {
             <h3 className="text-lg font-medium text-slate-800 mb-2">{report.title}</h3>
             <p className="text-sm text-slate-600 flex-grow mb-4">{report.desc}</p>
             <div className="mt-auto flex flex-wrap gap-2">
+              {report.href && (
+                <Link
+                  href={report.href}
+                  className="flex items-center px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-md font-medium text-sm transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  View Report
+                </Link>
+              )}
               <button 
                 onClick={() => handleExport(report.id, 'print')}
                 className="flex items-center px-3 py-1.5 bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 rounded-md font-medium text-sm transition-colors"
