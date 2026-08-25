@@ -19,10 +19,10 @@ export async function GET(request: Request) {
     let data: any[] = [];
     
     if (reportId === 'master' || reportId === 'zone' || reportId === 'new' || reportId === 'category') {
-      const res = await fetch(`${backendUrl}/api/hawkers/master-report?page=1&pageSize=10000`, { headers, cache: 'no-store' });
+      const res = await fetch(`${backendUrl}/api/hawkers/report?page=1&pageSize=10000`, { headers, cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
-        const items = json.data?.items || [];
+        const items = json.data?.items || json.items || [];
         
         if (reportId === 'master' || reportId === 'new') {
           data = items.map((i: any) => ({
@@ -56,10 +56,11 @@ export async function GET(request: Request) {
         }
       }
     } else if (reportId === 'expiring') {
-      const res = await fetch(`${backendUrl}/api/renewals/expiring?days=30`, { headers, cache: 'no-store' });
+      const res = await fetch(`${backendUrl}/api/hawkers/report/renewed?days=30`, { headers, cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
-        data = (json.data || []).map((i: any) => ({
+        const items = json.data?.items || json.data || [];
+        data = items.map((i: any) => ({
           'Name': i.hawkerName || i.name || '-',
           'License Number': i.licenseNumber || '-',
           'Expiry Date': i.expiryDate ? new Date(i.expiryDate).toLocaleDateString() : '-'
