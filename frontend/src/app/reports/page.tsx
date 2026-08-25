@@ -38,6 +38,38 @@ export default function ReportsPage() {
           doc.save(`${reportId}_report.pdf`);
         });
       });
+    } else if (format === 'print') {
+      import('jspdf').then((jsPDFModule) => {
+        const jsPDF = jsPDFModule.default;
+        import('jspdf-autotable').then((autoTableModule) => {
+          const autoTable = autoTableModule.default;
+          const doc = new jsPDF();
+          doc.setFontSize(18);
+          doc.text(`Municipal Hawkers Report: ${reportId}`, 14, 22);
+          doc.setFontSize(11);
+          doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+          
+          autoTable(doc, {
+            startY: 40,
+            head: [['ID', 'Name', 'Status', 'Date']],
+            body: [
+              ['101', 'Sample Entry 1', 'Active', '2026-08-01'],
+              ['102', 'Sample Entry 2', 'Pending', '2026-08-05'],
+              ['103', 'Sample Entry 3', 'Expired', '2026-08-10'],
+            ],
+          });
+          
+          doc.autoPrint();
+          const pdfBlob = doc.output('blob');
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          const printWindow = window.open(blobUrl, '_blank');
+          if (printWindow) {
+            printWindow.onload = () => {
+              URL.revokeObjectURL(blobUrl);
+            };
+          }
+        });
+      });
     } else {
       // CSV format for both Excel and CSV options
       const content = `Report Name,Format,Date Generated\n${reportId},${format.toUpperCase()},${new Date().toLocaleDateString()}\n101,Sample Entry 1,Active\n102,Sample Entry 2,Pending\n`;
@@ -69,6 +101,13 @@ export default function ReportsPage() {
             <h3 className="text-lg font-medium text-slate-800 mb-2">{report.title}</h3>
             <p className="text-sm text-slate-600 flex-grow mb-4">{report.desc}</p>
             <div className="mt-auto flex flex-wrap gap-2">
+              <button 
+                onClick={() => handleExport(report.id, 'print')}
+                className="flex items-center px-3 py-1.5 bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 rounded-md font-medium text-sm transition-colors"
+              >
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                Print
+              </button>
               <button 
                 onClick={() => handleExport(report.id, 'pdf')}
                 className="flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors"
