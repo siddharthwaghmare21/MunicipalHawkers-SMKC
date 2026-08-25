@@ -27,7 +27,9 @@ const HAWKER_FIELDS = [
   { name: 'businessType', label: 'Business Type' },
   { name: 'businessTime', label: 'Business Time' },
   { name: 'locationType', label: 'Location Type' },
-  { name: 'partnerDependancy', label: 'Partner Dependancy' }
+  { name: 'partnerDependancy', label: 'Partner Dependancy' },
+  { name: 'licenseIssueDate', label: 'License Creation Date', type: 'date' },
+  { name: 'licenseExpiryDate', label: 'License Expiry Date', type: 'date' }
 ];
 
 export default async function ViewHawkerPage({ params }: { params: Promise<{ id: string }> }) {

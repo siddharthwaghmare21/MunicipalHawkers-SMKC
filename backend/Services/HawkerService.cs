@@ -345,6 +345,7 @@ namespace backend.Services
                 Id = hawker.Id,
                 ActiveLicenseId = activeLicense?.Id,
                 ActiveLicenseNumber = activeLicense?.LicenseNumber,
+                LicenseIssueDate = activeLicense?.IssueDate,
                 LicenseExpiryDate = activeLicense?.ExpiryDate,
                 EnrollmentNo = hawker.EnrollmentNo,
                 AadharNo = hawker.AadharNo,

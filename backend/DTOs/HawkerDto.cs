@@ -9,6 +9,7 @@ namespace backend.DTOs
         public int Id { get; set; }
         public int? ActiveLicenseId { get; set; }
         public string? ActiveLicenseNumber { get; set; }
+        public DateTime? LicenseIssueDate { get; set; }
         public DateTime? LicenseExpiryDate { get; set; }
         public string? EnrollmentNo { get; set; }
         public string FullName { get; set; } = string.Empty;
