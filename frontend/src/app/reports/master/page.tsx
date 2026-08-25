@@ -117,30 +117,37 @@ export default function MasterHawkerReportPage() {
   const exportPDF = async () => {
     const fullData = await fetchAllForExport();
     const formattedData = generateExportData(fullData);
-    const doc = new jsPDF('landscape', 'pt', 'a4');
     
     // Extract headers and data
-    const headers = Object.keys(formattedData[0] || {});
-    // Select a subset of important columns for PDF to fit in landscape A4, else it will be unreadable
     const pdfHeaders = ['Enrollment No', 'Full Name', 'Mobile Number', 'Ward Name', 'Business Type', 'Hawker Status', 'License Number', 'License Status'];
-    
     const rows = formattedData.map(row => pdfHeaders.map(header => row[header as keyof typeof row] || '-'));
 
-    doc.text("Master Hawker Report", 40, 40);
-    
-    autoTable(doc, {
-      head: [pdfHeaders],
+    const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+    await generateProfessionalPDF({
+      reportId: 'master',
+      reportTitle: 'Master Hawker Report',
+      headers: [pdfHeaders],
       body: rows,
-      startY: 60,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [59, 130, 246] } // blue-500
+      orientation: 'landscape'
     });
-
-    doc.save(`Master_Hawker_Report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    const fullData = await fetchAllForExport();
+    const formattedData = generateExportData(fullData);
+    
+    const pdfHeaders = ['Enrollment No', 'Full Name', 'Mobile Number', 'Ward Name', 'Business Type', 'Hawker Status', 'License Number', 'License Status'];
+    const rows = formattedData.map(row => pdfHeaders.map(header => row[header as keyof typeof row] || '-'));
+
+    const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+    await generateProfessionalPDF({
+      reportId: 'master',
+      reportTitle: 'Master Hawker Report',
+      headers: [pdfHeaders],
+      body: rows,
+      orientation: 'landscape',
+      autoPrint: true
+    });
   };
 
   return (

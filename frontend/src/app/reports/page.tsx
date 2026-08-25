@@ -15,63 +15,22 @@ export default function ReportsPage() {
     { id: 'audit', title: 'System Audit Logs', desc: 'Detailed logs of admin actions, approvals, and rejections for accountability.' }
   ];
 
-  const handleExport = (reportId: string, format: string) => {
-    if (format === 'pdf') {
-      // Import dynamically to avoid SSR issues if necessary, or just use require
-      import('jspdf').then((jsPDFModule) => {
-        const jsPDF = jsPDFModule.default;
-        import('jspdf-autotable').then((autoTableModule) => {
-          const autoTable = autoTableModule.default;
-          const doc = new jsPDF();
-          doc.setFontSize(18);
-          doc.text(`Municipal Hawkers Report: ${reportId}`, 14, 22);
-          doc.setFontSize(11);
-          doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-          
-          autoTable(doc, {
-            startY: 40,
-            head: [['ID', 'Name', 'Status', 'Date']],
-            body: [
-              ['101', 'Sample Entry 1', 'Active', '2026-08-01'],
-              ['102', 'Sample Entry 2', 'Pending', '2026-08-05'],
-              ['103', 'Sample Entry 3', 'Expired', '2026-08-10'],
-            ],
-          });
-          
-          doc.save(`${reportId}_report.pdf`);
-        });
-      });
-    } else if (format === 'print') {
-      import('jspdf').then((jsPDFModule) => {
-        const jsPDF = jsPDFModule.default;
-        import('jspdf-autotable').then((autoTableModule) => {
-          const autoTable = autoTableModule.default;
-          const doc = new jsPDF();
-          doc.setFontSize(18);
-          doc.text(`Municipal Hawkers Report: ${reportId}`, 14, 22);
-          doc.setFontSize(11);
-          doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-          
-          autoTable(doc, {
-            startY: 40,
-            head: [['ID', 'Name', 'Status', 'Date']],
-            body: [
-              ['101', 'Sample Entry 1', 'Active', '2026-08-01'],
-              ['102', 'Sample Entry 2', 'Pending', '2026-08-05'],
-              ['103', 'Sample Entry 3', 'Expired', '2026-08-10'],
-            ],
-          });
-          
-          doc.autoPrint();
-          const pdfBlob = doc.output('blob');
-          const blobUrl = URL.createObjectURL(pdfBlob);
-          const printWindow = window.open(blobUrl, '_blank');
-          if (printWindow) {
-            printWindow.onload = () => {
-              URL.revokeObjectURL(blobUrl);
-            };
-          }
-        });
+  const handleExport = async (reportId: string, format: string) => {
+    if (format === 'pdf' || format === 'print') {
+      const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+      const reportTitle = reportsList.find(r => r.id === reportId)?.title || reportId;
+      
+      await generateProfessionalPDF({
+        reportId,
+        reportTitle,
+        headers: [['ID', 'Name', 'Status', 'Date']],
+        body: [
+          ['101', 'Sample Entry 1', 'Active', '2026-08-01'],
+          ['102', 'Sample Entry 2', 'Pending', '2026-08-05'],
+          ['103', 'Sample Entry 3', 'Expired', '2026-08-10'],
+        ],
+        orientation: 'p',
+        autoPrint: format === 'print'
       });
     } else {
       // CSV format for both Excel and CSV options

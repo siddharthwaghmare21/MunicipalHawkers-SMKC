@@ -101,9 +101,7 @@ export default function RenewedHawkersReportPage() {
     XLSX.writeFile(wb, `Renewed_Hawkers_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF('p', 'pt', 'a4');
-    
+  const exportPDF = async () => {
     const pdfHeaders = ['Name', 'Business Name', 'Business Type', 'Renew Date', 'Expiry Date'];
     const rows = data.map(item => [
       item.name,
@@ -113,21 +111,35 @@ export default function RenewedHawkersReportPage() {
       new Date(item.expiryDate).toLocaleDateString()
     ]);
 
-    doc.text("Renewed Hawker Details Report", 40, 40);
-    
-    autoTable(doc, {
-      head: [pdfHeaders],
+    const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+    await generateProfessionalPDF({
+      reportId: 'renewals',
+      reportTitle: 'Recently Renewed Licenses',
+      headers: [pdfHeaders],
       body: rows,
-      startY: 60,
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [59, 130, 246] }
+      orientation: 'portrait'
     });
-
-    doc.save(`Renewed_Hawkers_Report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    const pdfHeaders = ['Name', 'Business Name', 'Business Type', 'Renew Date', 'Expiry Date'];
+    const rows = data.map(item => [
+      item.name,
+      item.businessName || '-',
+      item.businessType || '-',
+      new Date(item.renewDate).toLocaleDateString(),
+      new Date(item.expiryDate).toLocaleDateString()
+    ]);
+
+    const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+    await generateProfessionalPDF({
+      reportId: 'renewals',
+      reportTitle: 'Recently Renewed Licenses',
+      headers: [pdfHeaders],
+      body: rows,
+      orientation: 'portrait',
+      autoPrint: true
+    });
   };
 
   return (
