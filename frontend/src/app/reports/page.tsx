@@ -11,7 +11,8 @@ export default function ReportsPage() {
     { id: 'expiring', title: 'Expiring Licenses (Next 30 Days)', desc: 'List of all hawker licenses scheduled to expire shortly.' },
     { id: 'new', title: 'New Registrations', desc: 'Detailed report on new hawkers registered over the current fiscal year.' },
     { id: 'pending', title: 'Pending Approvals', desc: 'List of hawker applications and documents waiting for admin verification.' },
-    { id: 'category', title: 'Vending Category Distribution', desc: 'Breakdown of what hawkers are selling (e.g., Food, Vegetables, Goods).' }
+    { id: 'category', title: 'Vending Category Distribution', desc: 'Breakdown of what hawkers are selling (e.g., Food, Vegetables, Goods).' },
+    { id: 'audit', title: 'System Audit Logs', desc: 'Detailed logs of admin actions, approvals, and rejections for accountability.' }
   ];
 
   const handleExport = (reportId: string, format: string) => {
