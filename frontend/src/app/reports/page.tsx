@@ -17,36 +17,48 @@ export default function ReportsPage() {
   ];
 
   const handleExport = async (reportId: string, format: string) => {
-    if (format === 'pdf' || format === 'print') {
-      const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+    try {
+      const res = await fetch(`/api/reports/generate?id=${reportId}`);
+      const result = await res.json();
+      
+      let data = result.success && result.data && result.data.length > 0 ? result.data : [{ 'Message': 'No Data' }];
+      let headers: string[] = Object.keys(data[0]);
+      let body: any[][] = data.map((row: any) => headers.map(h => row[h] || '-'));
       const reportTitle = reportsList.find(r => r.id === reportId)?.title || reportId;
-      
-      await generateProfessionalPDF({
-        reportId,
-        reportTitle,
-        headers: [['ID', 'Name', 'Status', 'Date']],
-        body: [
-          ['101', 'Sample Entry 1', 'Active', '2026-08-01'],
-          ['102', 'Sample Entry 2', 'Pending', '2026-08-05'],
-          ['103', 'Sample Entry 3', 'Expired', '2026-08-10'],
-        ],
-        orientation: 'p',
-        autoPrint: format === 'print'
-      });
-    } else {
-      // CSV format for both Excel and CSV options
-      const content = `Report Name,Format,Date Generated\n${reportId},${format.toUpperCase()},${new Date().toLocaleDateString()}\n101,Sample Entry 1,Active\n102,Sample Entry 2,Pending\n`;
-      
-      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${reportId}_report.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+
+      if (format === 'pdf' || format === 'print') {
+        const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
+        await generateProfessionalPDF({
+          reportId,
+          reportTitle,
+          headers: [headers],
+          body: body,
+          orientation: headers.length > 5 ? 'landscape' : 'portrait',
+          autoPrint: format === 'print'
+        });
+      } else if (format === 'excel') {
+        const XLSX = await import('xlsx');
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+        XLSX.writeFile(workbook, `SMKC_${reportId.toUpperCase()}_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+      } else if (format === 'csv') {
+        const XLSX = await import('xlsx');
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
+        const blob = new Blob([csvOutput], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `SMKC_${reportId.toUpperCase()}_Report_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Failed to export', err);
+      alert('Failed to generate report. Please try again.');
     }
   };
 
