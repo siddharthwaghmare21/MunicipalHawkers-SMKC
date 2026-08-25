@@ -33,7 +33,7 @@ export const generateProfessionalPDF = async (options: ReportOptions) => {
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const reportNumber = `Hawkers-SMKC-${reportId.toUpperCase()}-Report${Math.floor(Math.random() * 900) + 100}`;
+  const reportNumber = `MH-SMKC-Report${Math.floor(Math.random() * 900) + 100}`;
   
   autoTable(doc, {
     head: headers,
@@ -86,7 +86,7 @@ export const generateProfessionalPDF = async (options: ReportOptions) => {
       
       // Left side: Report Number and Date
       const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-      doc.text(`${reportNumber} | Generated: ${dateStr}`, 40, footerY);
+      doc.text(`${reportNumber} | Generated on : ${dateStr}`, 40, footerY);
       
       // Right side: Page X of Y
       const str = `Page ${data.pageNumber}`;
