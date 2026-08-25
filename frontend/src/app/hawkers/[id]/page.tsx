@@ -64,7 +64,8 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
   const formatValue = (value: any, type?: string) => {
     if (value === null || value === undefined) return 'N/A';
     if (type === 'date') {
-      return new Date(value).toLocaleDateString();
+      const d = new Date(value);
+      return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
     }
     if (type === 'boolean') {
       return value ? 'Yes' : 'No';
