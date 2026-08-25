@@ -6,10 +6,12 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 
 export default function ReportsPage() {
   const reportsList = [
-    { id: 'master', title: 'Monthly Revenue Collection', desc: 'Summary of all license fees and penalties collected in the last month.' },
-    { id: 'zone', title: 'Hawker Zone Distribution', desc: 'Analytics on hawker density across different municipal zones.' },
+    { id: 'master', title: 'Master Hawker List', desc: 'Comprehensive directory of all registered and verified hawkers.' },
+    { id: 'zone', title: 'Hawker Zone Distribution', desc: 'Analytics on hawker density across different municipal zones and wards.' },
     { id: 'expiring', title: 'Expiring Licenses (Next 30 Days)', desc: 'List of all hawker licenses scheduled to expire shortly.' },
-    { id: 'new', title: 'New Registrations', desc: 'Detailed report on new hawkers registered over the current fiscal year.' }
+    { id: 'new', title: 'New Registrations', desc: 'Detailed report on new hawkers registered over the current fiscal year.' },
+    { id: 'pending', title: 'Pending Approvals', desc: 'List of hawker applications and documents waiting for admin verification.' },
+    { id: 'category', title: 'Vending Category Distribution', desc: 'Breakdown of what hawkers are selling (e.g., Food, Vegetables, Goods).' }
   ];
 
   const handleExport = (reportId: string, format: string) => {
