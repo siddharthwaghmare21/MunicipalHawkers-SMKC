@@ -60,7 +60,8 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
       });
       if (photoDoc) {
         if (photoDoc.filePath) {
-          return photoDoc.filePath.startsWith('http') ? photoDoc.filePath : photoDoc.filePath;
+          const backendBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://municipal-hawkers-smkc.onrender.com';
+          return photoDoc.filePath.startsWith('http') ? photoDoc.filePath : `${backendBase}${photoDoc.filePath}`;
         }
         return `/api/documents/download/${photoDoc.id}`;
       }
