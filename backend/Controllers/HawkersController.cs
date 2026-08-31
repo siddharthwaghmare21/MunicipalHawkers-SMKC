@@ -54,7 +54,8 @@ namespace backend.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker(string licenseNumber)
         {
-            var hawker = await _hawkerService.GetHawkerByLicenseNumberAsync(licenseNumber);
+            var decodedLicenseNumber = Uri.UnescapeDataString(licenseNumber);
+            var hawker = await _hawkerService.GetHawkerByLicenseNumberAsync(decodedLicenseNumber);
             if (hawker == null)
             {
                 return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with License Number {licenseNumber} not found."));
