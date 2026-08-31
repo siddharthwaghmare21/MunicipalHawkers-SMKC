@@ -50,14 +50,14 @@ namespace backend.Controllers
             return Ok(ApiResponse<PaginatedResult<RenewedHawkerReportDto>>.Ok(result));
         }
 
-        [HttpGet("public/{enrollmentNo}")]
+        [HttpGet("public/{licenseNumber}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker(string enrollmentNo)
+        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker(string licenseNumber)
         {
-            var hawker = await _hawkerService.GetHawkerByEnrollmentNoAsync(enrollmentNo);
+            var hawker = await _hawkerService.GetHawkerByLicenseNumberAsync(licenseNumber);
             if (hawker == null)
             {
-                return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with Enrollment Number {enrollmentNo} not found."));
+                return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with License Number {licenseNumber} not found."));
             }
 
             // Since this is a public verification endpoint, return the hawker data.

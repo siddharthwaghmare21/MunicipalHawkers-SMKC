@@ -23,7 +23,7 @@ namespace backend.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Hawker>()
-                .HasIndex(h => h.EnrollmentNo)
+                .HasIndex(h => h.LicenseNumber)
                 .IsUnique();
 
             modelBuilder.Entity<DocumentType>().HasData(

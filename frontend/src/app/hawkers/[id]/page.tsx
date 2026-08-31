@@ -10,7 +10,7 @@ import { IDCardActions } from '@/components/hawkers/IDCardActions';
 import { HawkerQRCode } from '@/components/hawkers/HawkerQRCode';
 
 const HAWKER_FIELDS = [
-  { name: 'enrollmentNo', label: 'Enrollment No' },
+  { name: 'licenseNumber', label: 'License Number' },
   { name: 'aadharNo', label: 'Aadhar No' },
   { name: 'fullName', label: 'Full Name' },
   { name: 'fatherHusbandName', label: 'Father / Husband Name' },
@@ -139,7 +139,7 @@ export default async function ViewHawkerPage({ params }: { params: Promise<{ id:
               </Card>
             </div>
             <div className="lg:col-span-1">
-              <HawkerQRCode enrollmentNo={hawker.enrollmentNo} />
+              <HawkerQRCode licenseNumber={hawker.licenseNumber} />
             </div>
           </div>
           <div className="mt-8">

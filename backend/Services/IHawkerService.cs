@@ -7,7 +7,7 @@ namespace backend.Services
     {
         Task<PaginatedResult<HawkerDto>> GetAllHawkersAsync(string? searchQuery = null, string? zoneFilter = null, string? statusFilter = null, int page = 1, int pageSize = 10);
         Task<HawkerDto?> GetHawkerByIdAsync(int id);
-        Task<HawkerDto?> GetHawkerByEnrollmentNoAsync(string enrollmentNo);
+        Task<HawkerDto?> GetHawkerByLicenseNumberAsync(string licenseNumber);
         Task<HawkerDto> CreateHawkerAsync(CreateHawkerDto dto, int? userId);
         Task<HawkerDto?> UpdateHawkerAsync(int id, UpdateHawkerDto dto, int? userId);
         Task<HawkerDto?> RejectHawkerAsync(int id, RejectDto dto, int? userId);

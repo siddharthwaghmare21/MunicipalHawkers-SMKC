@@ -3,11 +3,11 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
-export function HawkerQRCode({ enrollmentNo }: { enrollmentNo: string }) {
-  if (!enrollmentNo) return null;
+export function HawkerQRCode({ licenseNumber }: { licenseNumber: string }) {
+  if (!licenseNumber) return null;
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' && !window.location.hostname.includes('localhost') ? window.location.origin : 'https://municipal-hawkers-smkc.vercel.app');
-  const verifyUrl = `${baseUrl}/verify/${encodeURIComponent(enrollmentNo)}`;
+  const verifyUrl = `${baseUrl}/verify/${encodeURIComponent(licenseNumber)}`;
 
   return (
     <div className="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">

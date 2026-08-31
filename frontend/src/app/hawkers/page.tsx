@@ -134,7 +134,7 @@ export default async function HawkersPage(props: {
                 </tr>
               ) : items.map((hawker: any) => (
                 <tr key={hawker.id} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-brand-primary text-center">{hawker.enrollmentNo || hawker.id}</td>
+                  <td className="px-4 py-3 font-medium text-brand-primary text-center">{hawker.licenseNumber || hawker.id}</td>
                   <td className="px-4 py-3 text-slate-800 font-medium text-center">{hawker.fullName}</td>
                   <td className="px-4 py-3 text-slate-600 text-center">{hawker.mobileNumber}</td>
                   <td className="px-4 py-3 text-slate-600 text-center">{hawker.zone || 'N/A'}</td>

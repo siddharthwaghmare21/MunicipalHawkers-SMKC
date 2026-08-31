@@ -141,7 +141,7 @@ export function IDCardActions({ hawker }: { hawker: any }) {
         });
         
         pdf.addImage(canvas, 'PNG', 0, 0, 85.6, 54);
-        pdf.save(`Hawker-IDCard-${hawker.enrollmentNo || hawker.id}.pdf`);
+        pdf.save(`Hawker-IDCard-${hawker.licenseNumber || hawker.id}.pdf`);
       } catch (err) {
         console.error('Error generating PDF:', err);
         alert('Failed to generate PDF. Please try again.');
@@ -152,7 +152,7 @@ export function IDCardActions({ hawker }: { hawker: any }) {
   const activeLic = resolvedLicense || (hawker?.licenses && hawker.licenses.length > 0 ? hawker.licenses[0] : null);
   const expiryDate = activeLic?.expiryDate || hawker?.licenseExpiryDate || hawker?.expiryDate;
   const issueDate = activeLic?.issueDate || hawker?.issueDate || hawker?.createdDate;
-  const licenseNumber = activeLic?.licenseNumber || hawker?.activeLicenseNumber || hawker?.enrollmentNo;
+  const licenseNumber = activeLic?.licenseNumber || hawker?.activeLicenseNumber || hawker?.licenseNumber;
 
   return (
     <>

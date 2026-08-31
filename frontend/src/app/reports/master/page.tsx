@@ -65,7 +65,7 @@ export default function MasterHawkerReportPage() {
 
   const generateExportData = (exportData: any[]) => {
     return exportData.map(item => ({
-      'Enrollment No': item.enrollmentNo || '-',
+      'License Number': item.licenseNumber || '-',
       'Full Name': item.fullName || '-',
       'Address': item.address || '-',
       'Gender': item.gender || '-',
@@ -82,7 +82,6 @@ export default function MasterHawkerReportPage() {
       'Location Type': item.locationType || '-',
       'Partner Dependency': item.partnerDependancy || '-',
       'Hawker Status': item.hawkerStatus || '-',
-      'License Number': item.licenseNumber || '-',
       'License Issue': item.licenseIssueDate ? new Date(item.licenseIssueDate).toLocaleDateString() : '-',
       'License Expiry': item.licenseExpiryDate ? new Date(item.licenseExpiryDate).toLocaleDateString() : '-',
       'License Status': item.licenseStatus || '-'
@@ -119,7 +118,7 @@ export default function MasterHawkerReportPage() {
     const formattedData = generateExportData(fullData);
     
     // Extract headers and data
-    const pdfHeaders = ['Enrollment No', 'Full Name', 'Mobile Number', 'Ward Name', 'Business Type', 'Hawker Status', 'License Number', 'License Status'];
+    const pdfHeaders = ['License Number', 'Full Name', 'Mobile Number', 'Ward Name', 'Business Type', 'Hawker Status', 'License Status'];
     const rows = formattedData.map(row => pdfHeaders.map(header => row[header as keyof typeof row] || '-'));
 
     const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
@@ -136,7 +135,7 @@ export default function MasterHawkerReportPage() {
     const fullData = await fetchAllForExport();
     const formattedData = generateExportData(fullData);
     
-    const pdfHeaders = ['Enrollment No', 'Full Name', 'Mobile Number', 'Ward Name', 'Business Type', 'Hawker Status', 'License Number', 'License Status'];
+    const pdfHeaders = ['License Number', 'Full Name', 'Mobile Number', 'Ward Name', 'Business Type', 'Hawker Status', 'License Status'];
     const rows = formattedData.map(row => pdfHeaders.map(header => row[header as keyof typeof row] || '-'));
 
     const { generateProfessionalPDF } = await import('@/utils/pdfGenerator');
@@ -185,7 +184,7 @@ export default function MasterHawkerReportPage() {
           <form onSubmit={handleSearch} className="w-full md:w-96 flex">
             <input 
               type="text" 
-              placeholder="Search by Enrollment No or Name..." 
+              placeholder="Search by License Number or Name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 rounded-l-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm px-4 py-2 border"
@@ -203,7 +202,7 @@ export default function MasterHawkerReportPage() {
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="text-xs text-slate-500 uppercase bg-slate-50 print:bg-transparent">
               <tr>
-                <th className="px-4 py-3 text-center">Enrollment No</th>
+                <th className="px-4 py-3 text-center">License Number</th>
                 <th className="px-4 py-3 text-center">Full Name</th>
                 <th className="px-4 py-3 text-center">Gender / DOB</th>
                 <th className="px-4 py-3 text-center">Mobile Number</th>
@@ -224,7 +223,7 @@ export default function MasterHawkerReportPage() {
                 </tr>
               ) : data.map((item, idx) => (
                 <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 print:break-inside-avoid">
-                  <td className="px-4 py-3 font-medium text-slate-800 text-center">{item.enrollmentNo || '-'}</td>
+                  <td className="px-4 py-3 font-medium text-slate-800 text-center">{item.licenseNumber || '-'}</td>
                   <td className="px-4 py-3 text-center">{item.fullName}</td>
                   <td className="px-4 py-3 text-center">
                     <div>{item.gender || '-'}</div>

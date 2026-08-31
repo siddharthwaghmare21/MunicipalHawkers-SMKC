@@ -7,7 +7,6 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { IDCard } from '@/components/hawkers/IDCard';
 
 const HAWKER_FIELDS = [
-  { name: 'enrollmentNo', label: 'Unique ID / License No', type: 'text', required: true },
   { name: 'aadharNo', label: 'Aadhar No', type: 'text', required: true },
   { name: 'fullName', label: 'Full Name', type: 'text', required: true },
   { name: 'fatherHusbandName', label: 'Father / Husband Name', type: 'text', required: true },
@@ -60,7 +59,6 @@ interface PendingDocument {
 export default function AddHawkerPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<Record<string, string>>({
-    enrollmentNo: generateUniqueId(),
     gender: 'Male',
     handicap: 'No',
     licenseExpiryDate: getDefaultExpiryDate()
@@ -416,7 +414,7 @@ export default function AddHawkerPage() {
                 <IDCard 
                   hawker={formData}
                   photoUrl={previewPhotoUrl}
-                  licenseNumber={formData.enrollmentNo}
+                  licenseNumber="Generating on Save..."
                   issueDate={new Date().toISOString()}
                   expiryDate={formData.licenseExpiryDate}
                 />

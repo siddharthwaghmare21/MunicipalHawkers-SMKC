@@ -76,7 +76,7 @@ export default async function DashboardPage() {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3 text-center">ID / Enrollment No</th>
+                    <th className="px-4 py-3 text-center">License Number</th>
                     <th className="px-4 py-3 text-center">Name</th>
                     <th className="px-4 py-3 text-center">Mobile</th>
                     <th className="px-4 py-3 text-center">Status</th>
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
                   ) : stats.recentlyAddedHawkers.map((hawker: any, idx: number) => (
                     <tr key={idx} className="border-b border-slate-100">
                       <td className="px-4 py-3 font-medium text-brand-primary text-center">
-                         {hawker.enrollmentNo || `HWK-${hawker.id}`}
+                         {hawker.licenseNumber || `HWK-${hawker.id}`}
                       </td>
                       <td className="px-4 py-3 text-slate-800 text-center">{hawker.fullName}</td>
                       <td className="px-4 py-3 text-slate-600 text-center">{hawker.mobileNumber || '-'}</td>

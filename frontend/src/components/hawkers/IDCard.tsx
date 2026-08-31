@@ -46,7 +46,7 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
 
   const uniqueId = licenseNumber && licenseNumber !== 'LIC-PENDING' 
     ? licenseNumber 
-    : (hawker?.activeLicenseNumber || hawker?.enrollmentNo || '-');
+    : (hawker?.activeLicenseNumber || hawker?.licenseNumber || '-');
 
   const resolvedPhotoUrl = photoUrl || hawker?.photoUrl || (() => {
     const docs = hawker?.documents;
@@ -128,9 +128,9 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
           
           {/* Left: 11 Ordered Fields */}
           <div style={{ flex: 1, fontSize: '6px', lineHeight: '1.35', color: '#0f172a', paddingRight: '3px', zIndex: 10 }}>
-            <div style={{ display: 'flex' }}>
-              <span style={{ fontWeight: 'bold', width: '22mm' }}>Unique ID of Vendor</span>
-              <span style={{ fontWeight: 'bold' }}>: {safeStr(uniqueId)}</span>
+            <div style={{ marginBottom: '1.5px' }}>
+              <div style={{ fontWeight: 'bold', color: '#2b4c8a', textTransform: 'uppercase', fontSize: '5px', lineHeight: '1' }}>UNIQUE ID OF VENDOR</div>
+              <div style={{ fontWeight: 'bold', fontSize: '7.5px', color: '#0f172a', lineHeight: '1.1' }}>{safeStr(uniqueId)}</div>
             </div>
             <div style={{ display: 'flex' }}>
               <span style={{ fontWeight: 'bold', width: '22mm' }}>Aadhar No.</span>

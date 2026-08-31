@@ -11,7 +11,7 @@ namespace backend.DTOs
         public string? ActiveLicenseNumber { get; set; }
         public DateTime? LicenseIssueDate { get; set; }
         public DateTime? LicenseExpiryDate { get; set; }
-        public string? EnrollmentNo { get; set; }
+        public string? LicenseNumber { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string? FatherHusbandName { get; set; }
         public string? AadharNo { get; set; }
@@ -42,9 +42,6 @@ namespace backend.DTOs
 
     public class CreateHawkerDto
     {
-        [StringLength(50)]
-        public string? EnrollmentNo { get; set; }
-
         [Required(ErrorMessage = "Full Name is required.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Full Name must be between 3 and 100 characters.")]
         public string FullName { get; set; } = string.Empty;

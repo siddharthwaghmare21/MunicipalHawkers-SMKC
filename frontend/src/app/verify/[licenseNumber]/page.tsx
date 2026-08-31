@@ -2,15 +2,15 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-async function getPublicHawker(enrollmentNo: string) {
+async function getPublicHawker(licenseNumber: string) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109';
-    const res = await fetch(`${backendUrl}/api/hawkers/public/${encodeURIComponent(enrollmentNo)}`, {
+    const res = await fetch(`${backendUrl}/api/hawkers/public/${encodeURIComponent(licenseNumber)}`, {
       cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error(`Failed to fetch public hawker ${enrollmentNo}: HTTP ${res.status}`);
+      console.error(`Failed to fetch public hawker ${licenseNumber}: HTTP ${res.status}`);
       return null;
     }
     
@@ -22,10 +22,10 @@ async function getPublicHawker(enrollmentNo: string) {
   }
 }
 
-export default async function VerifyHawkerPage({ params }: { params: Promise<{ enrollmentNo: string }> }) {
+export default async function VerifyHawkerPage({ params }: { params: Promise<{ licenseNumber: string }> }) {
   const resolvedParams = await params;
-  const enrollmentNo = resolvedParams?.enrollmentNo ? decodeURIComponent(resolvedParams.enrollmentNo) : '';
-  const hawker = enrollmentNo ? await getPublicHawker(enrollmentNo) : null;
+  const licenseNumber = resolvedParams?.licenseNumber ? decodeURIComponent(resolvedParams.licenseNumber) : '';
+  const hawker = licenseNumber ? await getPublicHawker(licenseNumber) : null;
 
   if (!hawker) {
     notFound();
@@ -80,13 +80,8 @@ export default async function VerifyHawkerPage({ params }: { params: Promise<{ e
           <div className="space-y-4">
             
             <div className="flex justify-between border-b border-slate-100 pb-3">
-              <span className="text-slate-500 text-sm">Enrollment No.</span>
-              <span className="font-semibold text-slate-800">{safeStr(hawker.enrollmentNo)}</span>
-            </div>
-
-            <div className="flex justify-between border-b border-slate-100 pb-3">
-              <span className="text-slate-500 text-sm">License Number</span>
-              <span className="font-semibold text-slate-800 text-right">{license ? license.licenseNumber : 'Pending'}</span>
+              <span className="text-slate-500 text-sm">UNIQUE ID OF VENDOR</span>
+              <span className="font-semibold text-slate-800">{safeStr(hawker.licenseNumber)}</span>
             </div>
 
             <div className="flex justify-between border-b border-slate-100 pb-3">

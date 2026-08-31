@@ -24,7 +24,8 @@ namespace backend.Entities
     public class Hawker
     {
         public int Id { get; set; }
-        public string? EnrollmentNo { get; set; }
+        [System.ComponentModel.DataAnnotations.Required]
+        public string LicenseNumber { get; set; } = string.Empty;
         public string? AadharNo { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string? FatherHusbandName { get; set; }
@@ -35,6 +36,7 @@ namespace backend.Entities
         public bool Handicap { get; set; }
         public string? ULBName { get; set; }
         public string? WardName { get; set; }
+
         public string? RoadName { get; set; }
         public string? LandMark { get; set; }
         public string? AreaType { get; set; }

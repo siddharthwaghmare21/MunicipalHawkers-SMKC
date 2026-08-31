@@ -30,7 +30,7 @@ namespace backend.Services
                 .Select(h => new HawkerSummaryDto
                 {
                     Id = h.Id,
-                    EnrollmentNo = h.EnrollmentNo,
+                    LicenseNumber = h.LicenseNumber,
                     FullName = h.FullName,
                     Status = h.Status,
                     MobileNumber = h.MobileNumber

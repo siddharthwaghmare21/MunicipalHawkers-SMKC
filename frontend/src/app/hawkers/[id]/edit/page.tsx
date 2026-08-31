@@ -7,7 +7,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import HawkerDocuments from '@/components/hawkers/HawkerDocuments';
 
 const HAWKER_FIELDS = [
-  { name: 'enrollmentNo', label: 'Enrollment No', type: 'text', required: true },
+  { name: 'licenseNumber', label: 'License Number', type: 'text', required: false, disabled: true },
   { name: 'aadharNo', label: 'Aadhar No', type: 'text', required: true },
   { name: 'fullName', label: 'Full Name', type: 'text', required: true },
   { name: 'fatherHusbandName', label: 'Father / Husband Name', type: 'text', required: true },
@@ -150,10 +150,11 @@ export default function EditHawkerPage({ params }: { params: Promise<{ id: strin
                       value={formData[field.name] || ''}
                       onChange={handleChange}
                       required={field.required}
-                      pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : field.name === 'enrollmentNo' ? '^SMKC-.*' : undefined}
-                      title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : field.name === 'enrollmentNo' ? "Enrollment Number must start with 'SMKC-'" : undefined}
+                      disabled={field.disabled}
+                      pattern={field.name === 'mobileNumber' ? '^\\d{10}$' : undefined}
+                      title={field.name === 'mobileNumber' ? 'Mobile Number must be exactly 10 digits' : undefined}
                       max={field.type === 'date' ? new Date().toISOString().split('T')[0] : undefined}
-                      className="border border-slate-300 rounded-md px-3 py-2.5 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm"
+                      className="border border-slate-300 rounded-md px-3 py-2.5 focus:ring-2 focus:ring-red-500 outline-none text-slate-700 text-sm disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     />
                   )}
                 </div>

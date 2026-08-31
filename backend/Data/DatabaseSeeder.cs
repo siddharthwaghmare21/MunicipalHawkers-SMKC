@@ -77,7 +77,11 @@ namespace backend.Data
                 var deptAdminUser = context.Users.FirstOrDefault(u => u.Username == "deptadmin");
 
                 var hawkerFaker = new Bogus.Faker<Hawker>("en_IND")
-                    .RuleFor(h => h.EnrollmentNo, f => "SMKC" + f.Random.Number(10000, 99999).ToString())
+                    .RuleFor(h => h.LicenseNumber, f => {
+                        var rand = f.Random.Number(100000, 999999);
+                        var now = DateTime.Now;
+                        return $"{rand}/{now:yyyy}/{now:MMdd}";
+                    })
                     .RuleFor(h => h.FullName, f => f.Name.FullName())
                     .RuleFor(h => h.Address, f => f.Address.StreetAddress() + ", " + f.Address.City())
                     .RuleFor(h => h.Gender, f => f.PickRandom("Male", "Female"))

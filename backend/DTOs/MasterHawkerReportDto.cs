@@ -5,7 +5,6 @@ namespace backend.DTOs
     public class MasterHawkerReportDto
     {
         public int HawkerId { get; set; }
-        public string? EnrollmentNo { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? Gender { get; set; }

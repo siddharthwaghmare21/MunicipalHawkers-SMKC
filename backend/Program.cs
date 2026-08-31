@@ -57,6 +57,7 @@ builder.Services.AddCors(options =>
 });
 
 // Configure Dependency Injection
+builder.Services.AddScoped<ILicenseNumberGenerator, LicenseNumberGenerator>();
 builder.Services.AddScoped<IHawkerService, HawkerService>();
 builder.Services.AddScoped<ILicenseService, LicenseService>();
 builder.Services.AddScoped<ILicenseRenewalService, LicenseRenewalService>();

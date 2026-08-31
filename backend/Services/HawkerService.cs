@@ -11,11 +11,13 @@ namespace backend.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IAuditLogService _auditLogService;
+        private readonly ILicenseNumberGenerator _licenseNumberGenerator;
 
-        public HawkerService(ApplicationDbContext context, IAuditLogService auditLogService)
+        public HawkerService(ApplicationDbContext context, IAuditLogService auditLogService, ILicenseNumberGenerator licenseNumberGenerator)
         {
             _context = context;
             _auditLogService = auditLogService;
+            _licenseNumberGenerator = licenseNumberGenerator;
         }
 
         public async Task<PaginatedResult<HawkerDto>> GetAllHawkersAsync(string? searchQuery = null, string? zoneFilter = null, string? statusFilter = null, int page = 1, int pageSize = 10)
@@ -29,7 +31,7 @@ namespace backend.Services
                 var lowerQuery = searchQuery.ToLower();
                 query = query.Where(h => 
                     (h.FullName != null && h.FullName.ToLower().Contains(lowerQuery)) || 
-                    (h.EnrollmentNo != null && h.EnrollmentNo.ToLower().Contains(lowerQuery)));
+                    (h.LicenseNumber != null && h.LicenseNumber.ToLower().Contains(lowerQuery)));
             }
 
             if (!string.IsNullOrWhiteSpace(zoneFilter))
@@ -71,14 +73,14 @@ namespace backend.Services
             return MapToDto(hawker);
         }
 
-        public async Task<HawkerDto?> GetHawkerByEnrollmentNoAsync(string enrollmentNo)
+        public async Task<HawkerDto?> GetHawkerByLicenseNumberAsync(string licenseNumber)
         {
-            if (string.IsNullOrWhiteSpace(enrollmentNo)) return null;
-            var cleanNo = enrollmentNo.Trim().ToLower();
+            if (string.IsNullOrWhiteSpace(licenseNumber)) return null;
+            var cleanLicense = licenseNumber.Trim().ToLower();
             var hawker = await _context.Hawkers
                 .Include(h => h.Licenses)
                 .Include(h => h.Documents).ThenInclude(d => d.DocumentType)
-                .FirstOrDefaultAsync(h => h.EnrollmentNo != null && h.EnrollmentNo.ToLower() == cleanNo);
+                .FirstOrDefaultAsync(h => h.LicenseNumber != null && h.LicenseNumber.ToLower() == cleanLicense);
             if (hawker == null) return null;
             return MapToDto(hawker);
         }
@@ -88,45 +90,13 @@ namespace backend.Services
             if (dto.DOB.HasValue && dto.DOB.Value > System.DateTime.UtcNow)
                 throw new System.InvalidOperationException("Date of Birth cannot be in the future.");
 
-            var now = System.DateTime.UtcNow;
-            var randomPart = new System.Random().Next(100000, 999999);
-            var autoUniqueId = $"{randomPart}/{now:yyyy}/{now:ddMM}";
-
-            // Ensure enrollment number follows the required format
-            if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
-            {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(dto.EnrollmentNo, "^\\d{6}/\\d{4}/\\d{4}$"))
-                {
-                    throw new System.InvalidOperationException("Enrollment number must be in the format '123456/2024/1501'.");
-                }
-            }
-
-            var finalEnrollmentNo = !string.IsNullOrWhiteSpace(dto.EnrollmentNo) 
-                ? dto.EnrollmentNo.Trim() 
-                : autoUniqueId;
-
-            if (!string.IsNullOrWhiteSpace(finalEnrollmentNo))
-            {
-                var cleanEnrollment = finalEnrollmentNo.ToLower();
-                var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo != null && h.EnrollmentNo.ToLower() == cleanEnrollment);
-                if (existing != null)
-                {
-                    // If auto-generated conflicted, re-generate with new random
-                    if (string.IsNullOrWhiteSpace(dto.EnrollmentNo))
-                    {
-                        randomPart = new System.Random().Next(100000, 999999);
-                        finalEnrollmentNo = $"{randomPart}/{now:yyyy}/{now:ddMM}";
-                    }
-                    else
-                    {
-                        throw new System.InvalidOperationException($"A hawker with Enrollment/Unique ID '{dto.EnrollmentNo}' already exists.");
-                    }
-                }
-            }
+            var now = System.DateTime.Now;
+            // Generate LicenseNumber automatically using the helper service
+            var licenseNumber = await _licenseNumberGenerator.GenerateAsync(_context, now);
 
             var hawker = new Hawker
             {
-                EnrollmentNo = finalEnrollmentNo,
+                LicenseNumber = licenseNumber,
                 AadharNo = dto.AadharNo?.Trim(),
                 FullName = dto.FullName,
                 FatherHusbandName = dto.FatherHusbandName,
@@ -147,26 +117,19 @@ namespace backend.Services
                 Status = "DRAFT",
                 RejectionReason = null,
                 Remarks = null,
-                RejectedBy = null,
+                RejectedById = null,
                 RejectedDate = null
             };
 
             _context.Hawkers.Add(hawker);
             await _context.SaveChangesAsync();
 
-            // License number should follow the same format as enrollment number
-            var licenseNo = hawker.EnrollmentNo ?? autoUniqueId;
-            if (!System.Text.RegularExpressions.Regex.IsMatch(licenseNo, "^\\d{6}/\\d{4}/\\d{4}$"))
-            {
-                // Fallback to generated format if somehow invalid
-                licenseNo = autoUniqueId;
-            }
             var defaultExpiry = new System.DateTime(now.Year + 5, now.Month, 1).AddMonths(1).AddDays(-1);
 
             var license = new License
             {
                 HawkerId = hawker.Id,
-                LicenseNumber = licenseNo,
+                LicenseNumber = licenseNumber,
                 IssueDate = now,
                 ExpiryDate = dto.LicenseExpiryDate ?? defaultExpiry,
                 LicenseType = "Standard",
@@ -186,17 +149,9 @@ namespace backend.Services
             if (dto.DOB.HasValue && dto.DOB.Value > System.DateTime.UtcNow)
                 throw new System.InvalidOperationException("Date of Birth cannot be in the future.");
 
-            if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
-            {
-                var existing = await _context.Hawkers.FirstOrDefaultAsync(h => h.EnrollmentNo == dto.EnrollmentNo && h.Id != id);
-                if (existing != null)
-                    throw new System.InvalidOperationException($"A hawker with Enrollment Number '{dto.EnrollmentNo}' already exists.");
-            }
-
             var hawker = await _context.Hawkers.FindAsync(id);
             if (hawker == null) return null;
 
-            hawker.EnrollmentNo = dto.EnrollmentNo;
             hawker.AadharNo = dto.AadharNo;
             hawker.FullName = dto.FullName;
             hawker.FatherHusbandName = dto.FatherHusbandName;
@@ -250,7 +205,7 @@ namespace backend.Services
 
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                query = query.Where(h => h.EnrollmentNo.Contains(searchQuery) || h.FullName.Contains(searchQuery));
+                query = query.Where(h => h.LicenseNumber.Contains(searchQuery) || h.FullName.Contains(searchQuery));
             }
 
             var totalItems = await query.CountAsync();
@@ -265,7 +220,6 @@ namespace backend.Services
                 return new MasterHawkerReportDto
                 {
                     HawkerId = h.Id,
-                    EnrollmentNo = h.EnrollmentNo,
                     FullName = h.FullName,
                     Address = h.Address,
                     Gender = h.Gender,
@@ -362,7 +316,7 @@ namespace backend.Services
                 ActiveLicenseNumber = activeLicense?.LicenseNumber,
                 LicenseIssueDate = activeLicense?.IssueDate,
                 LicenseExpiryDate = activeLicense?.ExpiryDate,
-                EnrollmentNo = hawker.EnrollmentNo,
+                LicenseNumber = hawker.LicenseNumber,
                 AadharNo = hawker.AadharNo,
                 FullName = hawker.FullName,
                 FatherHusbandName = hawker.FatherHusbandName,

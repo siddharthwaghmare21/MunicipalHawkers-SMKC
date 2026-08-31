@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         
         if (reportId === 'master' || reportId === 'new') {
           data = items.map((i: any) => ({
-            'Enrollment No': i.enrollmentNo || '-',
+            'License Number': i.licenseNumber || '-',
             'Full Name': i.fullName || '-',
             'Mobile Number': i.mobileNumber || '-',
             'Ward Name': i.wardName || '-',
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
         const json = await res.json();
         const pending = (json.data || []).filter((h: any) => h.status === 'UNDER_REVIEW');
         data = pending.map((i: any) => ({
-          'Enrollment No': i.enrollmentNo || '-',
+          'License Number': i.licenseNumber || '-',
           'Full Name': i.fullName || '-',
           'Mobile Number': i.mobileNumber || '-',
           'Status': i.status
