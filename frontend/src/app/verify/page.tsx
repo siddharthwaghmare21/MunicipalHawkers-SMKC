@@ -4,7 +4,7 @@ import { IDCard } from '@/components/hawkers/IDCard';
 async function getPublicHawker(licenseNumber: string) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109';
-    const res = await fetch(`${backendUrl}/api/hawkers/public/${encodeURIComponent(licenseNumber)}`, {
+    const res = await fetch(`${backendUrl}/api/hawkers/public/${licenseNumber}`, {
       cache: 'no-store'
     });
     
