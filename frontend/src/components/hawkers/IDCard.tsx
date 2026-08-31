@@ -60,8 +60,7 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
       });
       if (photoDoc) {
         if (photoDoc.filePath) {
-          const backend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-          return photoDoc.filePath.startsWith('http') ? photoDoc.filePath : `${backend}${photoDoc.filePath}`;
+          return photoDoc.filePath.startsWith('http') ? photoDoc.filePath : photoDoc.filePath;
         }
         return `/api/documents/download/${photoDoc.id}`;
       }

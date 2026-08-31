@@ -69,11 +69,7 @@ export default async function VerifyHawkerPage({ searchParams }: { searchParams:
   const expiryDate = license?.expiryDate;
   const issueDate = license?.issueDate;
 
-  const photoDoc = hawker.documents?.find((d: any) => {
-    const name = d.documentType?.name?.toLowerCase() || '';
-    return name.includes('photo') || name.includes('image') || d.contentType?.startsWith('image/');
-  });
-  const photoUrl = photoDoc ? `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5109'}${photoDoc.filePath}` : '';
+
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 sm:p-8 font-sans relative overflow-hidden">
@@ -103,7 +99,6 @@ export default async function VerifyHawkerPage({ searchParams }: { searchParams:
               licenseNumber={hawker.licenseNumber} 
               issueDate={issueDate} 
               expiryDate={expiryDate} 
-              photoUrl={photoUrl} 
             />
           </div>
         </div>
