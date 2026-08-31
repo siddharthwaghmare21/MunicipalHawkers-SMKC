@@ -416,7 +416,7 @@ export default function AddHawkerPage() {
                 <IDCard 
                   hawker={formData}
                   photoUrl={previewPhotoUrl}
-                  licenseNumber="LIC-PENDING"
+                  licenseNumber={formData.enrollmentNo}
                   issueDate={new Date().toISOString()}
                   expiryDate={formData.licenseExpiryDate}
                 />

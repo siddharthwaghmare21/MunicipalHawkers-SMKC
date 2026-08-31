@@ -92,6 +92,15 @@ namespace backend.Services
             var randomPart = new System.Random().Next(100000, 999999);
             var autoUniqueId = $"{randomPart}/{now:yyyy}/{now:ddMM}";
 
+            // Ensure enrollment number follows the required format
+            if (!string.IsNullOrWhiteSpace(dto.EnrollmentNo))
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(dto.EnrollmentNo, "^\\d{6}/\\d{4}/\\d{4}$"))
+                {
+                    throw new System.InvalidOperationException("Enrollment number must be in the format '123456/2024/1501'.");
+                }
+            }
+
             var finalEnrollmentNo = !string.IsNullOrWhiteSpace(dto.EnrollmentNo) 
                 ? dto.EnrollmentNo.Trim() 
                 : autoUniqueId;
@@ -145,7 +154,13 @@ namespace backend.Services
             _context.Hawkers.Add(hawker);
             await _context.SaveChangesAsync();
 
+            // License number should follow the same format as enrollment number
             var licenseNo = hawker.EnrollmentNo ?? autoUniqueId;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(licenseNo, "^\\d{6}/\\d{4}/\\d{4}$"))
+            {
+                // Fallback to generated format if somehow invalid
+                licenseNo = autoUniqueId;
+            }
             var defaultExpiry = new System.DateTime(now.Year + 5, now.Month, 1).AddMonths(1).AddDays(-1);
 
             var license = new License
