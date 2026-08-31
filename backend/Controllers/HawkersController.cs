@@ -50,7 +50,7 @@ namespace backend.Controllers
             return Ok(ApiResponse<PaginatedResult<RenewedHawkerReportDto>>.Ok(result));
         }
 
-        [HttpGet("public/{licenseNumber}")]
+        [HttpGet("public/{*licenseNumber}")]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker(string licenseNumber)
         {
