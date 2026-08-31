@@ -209,7 +209,7 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
           {uniqueId && uniqueId !== '-' && (
             <div style={{ backgroundColor: 'white', padding: '1px', borderRadius: '2px', marginRight: '8mm' }}>
               <QRCodeSVG 
-                value={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' && !window.location.hostname.includes('localhost') ? window.location.origin : 'https://municipal-hawkers-smkc.vercel.app')}/verify/${encodeURIComponent(uniqueId)}`} 
+                value={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://municipal-hawkers-smkc.vercel.app')}/verify?licenseNumber=${encodeURIComponent(uniqueId)}`}
                 size={34} 
                 level="M" 
                 includeMargin={false}
