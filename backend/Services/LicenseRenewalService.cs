@@ -81,6 +81,16 @@ namespace backend.Services
                 }
                 license.Remarks = dto.Remarks;
 
+                // Sync hawker status if active/approved
+                var hawker = await _context.Hawkers.FindAsync(license.HawkerId);
+                if (hawker != null && hawker.Status != "REJECTED")
+                {
+                    if (dto.Status.Equals("Active", StringComparison.OrdinalIgnoreCase) || dto.Status.Equals("APPROVED", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hawker.Status = "APPROVED";
+                    }
+                }
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 

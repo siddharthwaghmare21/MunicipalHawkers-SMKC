@@ -4,22 +4,25 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/Card';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { Badge } from '@/components/Badge';
 
 export default function RenewLicensePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = React.use(params);
 
   const [license, setLicense] = useState<any>(null);
+  const [hawker, setHawker] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
   const [expiryDate, setExpiryDate] = useState('');
-  const [licenseType, setLicenseType] = useState('');
-  const [status, setStatus] = useState('');
+  const [licenseType, setLicenseType] = useState('Standard');
+  const [status, setStatus] = useState('Active');
   const [remarks, setRemarks] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    async function fetchLicense() {
+    async function fetchLicenseAndHawker() {
       try {
         const res = await fetch(`/api/licenses/${id}`);
         if (!res.ok) {
@@ -27,13 +30,28 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
         }
         const json = await res.json();
         if (json.data) {
-          setLicense(json.data);
+          const lic = json.data;
+          setLicense(lic);
           
-          const baseDate = json.data.expiryDate ? new Date(json.data.expiryDate) : new Date();
-          baseDate.setFullYear(baseDate.getFullYear() + 5);
+          const baseDate = lic.expiryDate ? new Date(lic.expiryDate) : new Date();
+          baseDate.setFullYear(baseDate.getFullYear() + 1);
           setExpiryDate(baseDate.toISOString().split('T')[0]);
-          setLicenseType(json.data.licenseType || 'Standard');
-          setStatus(json.data.status || 'Active');
+          setLicenseType(lic.licenseType || 'Standard');
+          setStatus(lic.status || 'Active');
+
+          if (lic.hawkerId) {
+            try {
+              const hawkerRes = await fetch(`/api/hawkers/${lic.hawkerId}`);
+              if (hawkerRes.ok) {
+                const hawkerJson = await hawkerRes.json();
+                if (hawkerJson.data) {
+                  setHawker(hawkerJson.data);
+                }
+              }
+            } catch (hErr) {
+              console.warn('Could not load detailed hawker data:', hErr);
+            }
+          }
         } else {
           setError('License not found');
         }
@@ -43,18 +61,26 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
         setLoading(false);
       }
     }
-    fetchLicense();
+    fetchLicenseAndHawker();
   }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!window.confirm('Are you sure you want to renew this license? This will log a historical record.')) {
+    setError('');
+
+    if (license?.expiryDate && new Date(expiryDate) <= new Date(license.expiryDate)) {
+      setError('New Expiry Date must be strictly after the current Expiry Date.');
       return;
     }
 
+    if (!window.confirm('Are you sure you want to process this hawker license renewal? This will log an immutable historical record.')) {
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const payload = {
-        licenseId: id,
+        licenseId: parseInt(id, 10),
         expiryDate: expiryDate ? new Date(expiryDate).toISOString() : null,
         licenseType,
         status,
@@ -80,16 +106,30 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'Failed to submit renewal');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-500">Loading...</div>;
+    return <div className="p-8 text-center text-slate-500">Loading renewal details...</div>;
   }
 
   if (error && !license) {
-    return <div className="p-4 bg-red-50 text-red-600 rounded-md border border-red-200">{error}</div>;
+    return (
+      <div className="p-4 bg-red-50 text-red-600 rounded-md border border-red-200 m-6">
+        {error}
+      </div>
+    );
   }
+
+  const hawkerName = hawker?.fullName || license?.hawkerName || 'N/A';
+  const aadharNo = hawker?.aadharNo || 'N/A';
+  const mobileNumber = hawker?.mobileNumber || 'N/A';
+  const address = hawker?.address || 'N/A';
+  const businessType = hawker?.businessType || 'N/A';
+  const wardName = hawker?.wardName || 'N/A';
+  const currentLicenseNumber = license?.licenseNumber || hawker?.licenseNumber || 'N/A';
 
   return (
     <div className="space-y-6">
@@ -97,11 +137,14 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
         { label: 'Home', href: '/dashboard' }, 
         { label: 'Hawkers', href: '/hawkers' },
         { label: 'View License', href: `/licenses/${id}` },
-        { label: 'Renew' }
+        { label: 'Renew License' }
       ]} />
       
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-800">Renew License</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Hawker License Renewal</h1>
+          <p className="text-sm text-slate-500 mt-1">Review existing hawker credentials and apply a new validity period.</p>
+        </div>
       </div>
 
       {error && (
@@ -111,43 +154,86 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
       )}
 
       <Card>
-        <div className="mb-6 bg-slate-50 p-4 rounded-md border border-slate-200">
-          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-4">Current License Info</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Read-Only Hawker & Current License Summary */}
+        <div className="mb-8 bg-slate-50 p-6 rounded-xl border border-slate-200">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+              Read-Only Existing Record
+            </h2>
+            <Badge variant="default">Permanent License Identity</Badge>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
-              <p className="text-xs text-slate-500">Hawker Name</p>
-              <p className="font-medium text-slate-800">{license.hawkerId || 'Unknown'}</p>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Full Name</span>
+              <span className="font-semibold text-slate-800 text-base">{hawkerName}</span>
             </div>
+
             <div>
-              <p className="text-xs text-slate-500">License Number</p>
-              <p className="font-medium text-slate-800">{license.licenseNumber}</p>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">License Number</span>
+              <span className="font-mono font-bold text-slate-900 bg-white px-2.5 py-1 rounded border border-slate-200 inline-block mt-0.5">
+                {currentLicenseNumber}
+              </span>
             </div>
+
             <div>
-              <p className="text-xs text-slate-500">Existing Expiry Date</p>
-              <p className="font-medium text-slate-800">
-                {license.expiryDate ? new Date(license.expiryDate).toLocaleDateString() : 'N/A'}
-              </p>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Aadhaar Number</span>
+              <span className="font-medium text-slate-800">{aadharNo}</span>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Mobile Number</span>
+              <span className="font-medium text-slate-800">{mobileNumber}</span>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Ward / Location</span>
+              <span className="font-medium text-slate-800">{wardName}</span>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Business Type</span>
+              <span className="font-medium text-slate-800">{businessType}</span>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Address</span>
+              <span className="font-medium text-slate-800 truncate block max-w-xs">{address}</span>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-500 block uppercase tracking-wider">Current Expiry Date</span>
+              <span className="font-medium text-amber-700">
+                {license?.expiryDate ? new Date(license.expiryDate).toLocaleDateString() : 'N/A'}
+              </span>
             </div>
           </div>
         </div>
 
+        {/* Editable Renewal Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-base font-bold text-slate-800 border-b border-slate-100 pb-2">
+            Renewal Details
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">New Expiry Date</label>
+              <label className="block text-sm font-medium text-slate-700">
+                New Expiry Date <span className="text-red-500">*</span>
+              </label>
               <input
                 type="date"
                 required
-                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">License Type</label>
+              <label className="block text-sm font-medium text-slate-700">License Category/Type</label>
               <select
-                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm bg-white"
                 value={licenseType}
                 onChange={(e) => setLicenseType(e.target.value)}
               >
@@ -158,45 +244,46 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">Status</label>
+              <label className="block text-sm font-medium text-slate-700">License Status</label>
               <select
-                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm bg-white"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
                 <option value="Active">Active</option>
-                <option value="Expired">Expired</option>
+                <option value="Approved">Approved</option>
                 <option value="Pending">Pending</option>
+                <option value="Expired">Expired</option>
                 <option value="Suspended">Suspended</option>
-                <option value="Cancelled">Cancelled</option>
               </select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Remarks</label>
+            <label className="block text-sm font-medium text-slate-700">Renewal Remarks / Notes</label>
             <textarea
               rows={3}
-              className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Add any remarks for this renewal..."
+              placeholder="Enter official renewal remarks or reference notes..."
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-slate-100">
             <button
               type="button"
               onClick={() => router.push(`/licenses/${id}`)}
-              className="px-4 py-2.5 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none w-full sm:w-auto text-center"
+              className="px-5 py-2.5 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors w-full sm:w-auto text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none w-full sm:w-auto text-center"
+              disabled={submitting}
+              className="px-5 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none transition-colors disabled:opacity-50 w-full sm:w-auto text-center"
             >
-              Confirm Renewal
+              {submitting ? 'Processing Renewal...' : 'Submit License Renewal'}
             </button>
           </div>
         </form>
