@@ -43,67 +43,80 @@ namespace backend.Services
 
         public async Task<LicenseDto?> ProcessRenewalAsync(CreateLicenseRenewalDto dto, int? userId)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            var strategy = _context.Database.CreateExecutionStrategy();
 
-            try
+            return await strategy.ExecuteAsync(async () =>
             {
-                var license = await _context.Licenses.FindAsync(dto.LicenseId);
-                if (license == null) return null;
+                using var transaction = await _context.Database.BeginTransactionAsync();
 
-                if (license.Status == "REJECTED")
-                    throw new System.InvalidOperationException("Cannot renew a rejected license.");
-                
-                var expectedExpiryDate = license.ExpiryDate.AddYears(5);
-                if (dto.ExpiryDate.Date != expectedExpiryDate.Date)
+                try
                 {
-                    throw new System.InvalidOperationException($"Renewal expiry date must be exactly 5 years from current expiry date ({expectedExpiryDate:dd/MM/yyyy}).");
-                }
+                    var license = await _context.Licenses.FindAsync(dto.LicenseId);
+                    if (license == null) return null;
 
-                // 1. Preserve history by creating a LicenseRenewal record reflecting the PREVIOUS state.
-                // Or wait, the requirement is "Create LicenseRenewal record, Update current license".
-                // Usually, the renewal record logs the transaction that just occurred, meaning the NEW expiry and status.
-                // Let's store the new expiry and status in the renewal, representing the renewal action.
-                var renewal = new LicenseRenewal
-                {
-                    LicenseId = license.Id,
-                    RenewalDate = DateTime.UtcNow,
-                    ExpiryDate = dto.ExpiryDate,
-                    Status = dto.Status,
-                    UserId = userId,
-                    Remarks = dto.Remarks
-                };
+                    if (license.Status == "REJECTED")
+                        throw new System.InvalidOperationException("Cannot renew a rejected license.");
 
-                _context.LicenseRenewals.Add(renewal);
+                    // Calculate expected month-end date 5 years after current expiry date
+                    var future = license.ExpiryDate.AddYears(5);
+                    int daysInMonth = DateTime.DaysInMonth(future.Year, future.Month);
+                    var expectedExpiryDate = new DateTime(
+                        future.Year, 
+                        future.Month, 
+                        daysInMonth, 
+                        license.ExpiryDate.Hour, 
+                        license.ExpiryDate.Minute, 
+                        license.ExpiryDate.Second, 
+                        license.ExpiryDate.Kind
+                    );
 
-                // 2. Update current license
-                license.ExpiryDate = dto.ExpiryDate;
-                license.Status = dto.Status;
-                if (!string.IsNullOrWhiteSpace(dto.LicenseType))
-                {
-                    license.LicenseType = dto.LicenseType;
-                }
-                license.Remarks = dto.Remarks;
-
-                // Sync hawker status if active/approved
-                var hawker = await _context.Hawkers.FindAsync(license.HawkerId);
-                if (hawker != null && hawker.Status != "REJECTED")
-                {
-                    if (dto.Status.Equals("Active", StringComparison.OrdinalIgnoreCase) || dto.Status.Equals("APPROVED", StringComparison.OrdinalIgnoreCase))
+                    if (dto.ExpiryDate.Date != expectedExpiryDate.Date)
                     {
-                        hawker.Status = "APPROVED";
+                        throw new System.InvalidOperationException($"Renewal expiry date must be exactly the last day of the month 5 years after current expiry date ({expectedExpiryDate:dd/MM/yyyy}).");
                     }
+
+                    var renewal = new LicenseRenewal
+                    {
+                        LicenseId = license.Id,
+                        RenewalDate = DateTime.UtcNow,
+                        ExpiryDate = expectedExpiryDate,
+                        Status = dto.Status,
+                        UserId = userId,
+                        Remarks = dto.Remarks
+                    };
+
+                    _context.LicenseRenewals.Add(renewal);
+
+                    // Update current license
+                    license.ExpiryDate = expectedExpiryDate;
+                    license.Status = dto.Status;
+                    if (!string.IsNullOrWhiteSpace(dto.LicenseType))
+                    {
+                        license.LicenseType = dto.LicenseType;
+                    }
+                    license.Remarks = dto.Remarks;
+
+                    // Sync hawker status if active/approved
+                    var hawker = await _context.Hawkers.FindAsync(license.HawkerId);
+                    if (hawker != null && hawker.Status != "REJECTED")
+                    {
+                        if (dto.Status.Equals("Active", StringComparison.OrdinalIgnoreCase) || dto.Status.Equals("APPROVED", StringComparison.OrdinalIgnoreCase))
+                        {
+                            hawker.Status = "APPROVED";
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return await _licenseService.GetLicenseByIdAsync(license.Id);
                 }
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                return await _licenseService.GetLicenseByIdAsync(license.Id);
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
     }
 }
