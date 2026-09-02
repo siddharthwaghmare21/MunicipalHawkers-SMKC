@@ -25,7 +25,8 @@ namespace backend.Services
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
-            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Username == request.Username);
+            var normalizedUsername = request.Username?.Trim().ToLowerInvariant() ?? string.Empty;
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Username.ToLower() == normalizedUsername);
             if (user == null)
             {
                 return new LoginResponse { Success = false, Message = "Invalid username or password" };
