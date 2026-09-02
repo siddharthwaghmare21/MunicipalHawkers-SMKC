@@ -6,7 +6,7 @@ async function getPublicHawker(licenseNumber: string) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://municipal-hawkers-smkc.onrender.com';
     const encodedLicense = encodeURIComponent(licenseNumber);
-    const res = await fetch(`${backendUrl}/api/hawkers/public/${encodedLicense}`, {
+    const res = await fetch(`${backendUrl}/api/hawkers/public?licenseNumber=${encodedLicense}`, {
       cache: 'no-store',
     });
 

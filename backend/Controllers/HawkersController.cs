@@ -50,12 +50,11 @@ namespace backend.Controllers
             return Ok(ApiResponse<PaginatedResult<RenewedHawkerReportDto>>.Ok(result));
         }
 
-        [HttpGet("public/{*licenseNumber}")]
+        [HttpGet("public")]
         [AllowAnonymous]
-        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker(string licenseNumber)
+        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker([FromQuery] string licenseNumber)
         {
-            var decodedLicenseNumber = Uri.UnescapeDataString(licenseNumber);
-            var hawker = await _hawkerService.GetHawkerByLicenseNumberAsync(decodedLicenseNumber);
+            var hawker = await _hawkerService.GetHawkerByLicenseNumberAsync(licenseNumber);
             if (hawker == null)
             {
                 return NotFound(ApiResponse<HawkerDto>.Error($"Hawker with License Number {licenseNumber} not found."));
