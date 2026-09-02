@@ -52,8 +52,14 @@ namespace backend.Controllers
 
         [HttpGet("public")]
         [AllowAnonymous]
-        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker([FromQuery] string licenseNumber)
+        public async Task<ActionResult<ApiResponse<HawkerDto>>> GetPublicHawker()
         {
+            var licenseNumber = Request.Query["licenseNumber"].ToString();
+            if (string.IsNullOrWhiteSpace(licenseNumber))
+            {
+                return BadRequest(ApiResponse<HawkerDto>.Error("licenseNumber is required."));
+            }
+
             var hawker = await _hawkerService.GetHawkerByLicenseNumberAsync(licenseNumber);
             if (hawker == null)
             {
@@ -64,6 +70,7 @@ namespace backend.Controllers
             // The user requested ALL information including Aadhar Number to be visible.
             return Ok(ApiResponse<HawkerDto>.Ok(hawker, "Hawker retrieved successfully"));
         }
+
 
 
         [HttpGet("{id}")]
