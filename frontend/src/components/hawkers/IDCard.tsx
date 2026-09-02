@@ -107,7 +107,7 @@ export const IDCard = forwardRef<HTMLDivElement, IDCardProps>(({ hawker, license
           {/* Center Title */}
           <div style={{ flex: 1, paddingRight: '2px' }}>
             <div style={{ fontSize: '8.5px', fontWeight: 'bold', color: '#c92027', lineHeight: '1.1', textTransform: 'uppercase', letterSpacing: '-0.2px' }}>
-              SANGLI, MIRAJ & KUPWAD CITY CORPORATION, SANGLI
+              SANGLI, MIRAJ & KUPWAD CITY MUNICIPAL CORPORATION, SANGLI
             </div>
             <div style={{ backgroundColor: '#e2e8f0', display: 'inline-block', padding: '0.5px 3px', marginTop: '1px' }}>
               <div style={{ fontSize: '6.5px', fontWeight: 'bold', color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>

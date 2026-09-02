@@ -1,6 +1,7 @@
 // frontend/src/app/verify/page.tsx
 import React from 'react';
 import { IDCard } from '@/components/hawkers/IDCard';
+import PrintButton from './PrintButton';
 
 async function getPublicHawker(licenseNumber: string) {
   try {
@@ -36,14 +37,14 @@ export default async function VerifyHawkerPage({
   // Header / Footer Reusables
   // -------------------------------------------------------------------
   const renderHeader = () => (
-    <header className="text-center mb-8">
+    <header className="text-center mb-8 print:hidden">
       <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wide">SMKC Hawker</h1>
       <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">Digital Verification</h2>
     </header>
   );
 
   const renderFooter = () => (
-    <footer className="text-center text-xs text-slate-500 dark:text-slate-400 max-w-md mt-auto pt-8 pb-4">
+    <footer className="text-center text-xs text-slate-500 dark:text-slate-400 max-w-md mt-auto pt-8 pb-4 print:hidden">
       This digital record is generated dynamically from the Sangli Miraj &amp; Kupwad City Municipal Corporation official registry.
     </footer>
   );
@@ -53,7 +54,7 @@ export default async function VerifyHawkerPage({
   // -------------------------------------------------------------------
   if (!licenseNumber) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-start bg-slate-50 dark:bg-slate-900 py-10 px-4 sm:px-6 font-sans">
+      <div className="min-h-screen flex flex-col items-center justify-start bg-slate-50 dark:bg-slate-900 py-10 px-4 sm:px-6 font-sans print:bg-white print:min-h-0 print:py-0">
         {renderHeader()}
         
         <div className="w-full max-w-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-8 text-center flex flex-col items-center">
@@ -80,7 +81,7 @@ export default async function VerifyHawkerPage({
   // -------------------------------------------------------------------
   if (!hawker) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-start bg-slate-50 dark:bg-slate-900 py-10 px-4 sm:px-6 font-sans">
+      <div className="min-h-screen flex flex-col items-center justify-start bg-slate-50 dark:bg-slate-900 py-10 px-4 sm:px-6 font-sans print:bg-white print:min-h-0 print:py-0">
         {renderHeader()}
         
         <div className="w-full max-w-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-8 flex flex-col items-center">
@@ -112,11 +113,11 @@ export default async function VerifyHawkerPage({
   // Verified hawker view – professional, clean, mobile-first
   // -------------------------------------------------------------------
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-slate-50 dark:bg-slate-900 py-10 px-4 sm:px-6 font-sans">
+    <div className="min-h-screen flex flex-col items-center justify-start bg-slate-50 dark:bg-slate-900 py-10 px-4 sm:px-6 font-sans print:bg-white print:min-h-0 print:py-0">
       {renderHeader()}
 
       {/* Verification status badge */}
-      <div className="flex flex-col items-center mb-8">
+      <div className="flex flex-col items-center mb-8 print:hidden">
         <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center text-emerald-500 dark:text-emerald-400 mb-4">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -133,10 +134,13 @@ export default async function VerifyHawkerPage({
       </div>
 
       {/* Central ID Card */}
-      <div className="w-full max-w-md flex justify-center mb-8 overflow-x-auto">
+      <div className="w-full max-w-md flex flex-col items-center justify-center mb-8 overflow-x-auto print:mb-0 print:overflow-visible">
         <div className="flex-shrink-0">
           <IDCard hawker={hawker} licenseNumber={hawker.licenseNumber} issueDate={issueDate} expiryDate={expiryDate} />
         </div>
+        
+        {/* Print Button */}
+        <PrintButton />
       </div>
 
       {renderFooter()}
