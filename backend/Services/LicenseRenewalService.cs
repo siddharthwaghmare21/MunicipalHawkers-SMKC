@@ -53,8 +53,11 @@ namespace backend.Services
                 if (license.Status == "REJECTED")
                     throw new System.InvalidOperationException("Cannot renew a rejected license.");
                 
-                if (dto.ExpiryDate <= license.ExpiryDate)
-                    throw new System.InvalidOperationException("New Expiry Date must be later than the current Expiry Date.");
+                var expectedExpiryDate = license.ExpiryDate.AddYears(5);
+                if (dto.ExpiryDate.Date != expectedExpiryDate.Date)
+                {
+                    throw new System.InvalidOperationException($"Renewal expiry date must be exactly 5 years from current expiry date ({expectedExpiryDate:dd/MM/yyyy}).");
+                }
 
                 // 1. Preserve history by creating a LicenseRenewal record reflecting the PREVIOUS state.
                 // Or wait, the requirement is "Create LicenseRenewal record, Update current license".

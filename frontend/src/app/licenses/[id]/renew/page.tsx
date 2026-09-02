@@ -33,8 +33,9 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
           const lic = json.data;
           setLicense(lic);
           
+          // Calculate EXACTLY +5 years from Current Expiry Date
           const baseDate = lic.expiryDate ? new Date(lic.expiryDate) : new Date();
-          baseDate.setFullYear(baseDate.getFullYear() + 1);
+          baseDate.setFullYear(baseDate.getFullYear() + 5);
           setExpiryDate(baseDate.toISOString().split('T')[0]);
           setLicenseType(lic.licenseType || 'Standard');
           setStatus(lic.status || 'Active');
@@ -68,12 +69,7 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
     e.preventDefault();
     setError('');
 
-    if (license?.expiryDate && new Date(expiryDate) <= new Date(license.expiryDate)) {
-      setError('New Expiry Date must be strictly after the current Expiry Date.');
-      return;
-    }
-
-    if (!window.confirm('Are you sure you want to process this hawker license renewal? This will log an immutable historical record.')) {
+    if (!window.confirm('Are you sure you want to process this 5-Year hawker license renewal? This will log an immutable historical record.')) {
       return;
     }
 
@@ -130,6 +126,7 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
   const businessType = hawker?.businessType || 'N/A';
   const wardName = hawker?.wardName || 'N/A';
   const currentLicenseNumber = license?.licenseNumber || hawker?.licenseNumber || 'N/A';
+  const currentExpiryFormatted = license?.expiryDate ? new Date(license.expiryDate).toLocaleDateString() : 'N/A';
 
   return (
     <div className="space-y-6">
@@ -142,8 +139,8 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
       
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Hawker License Renewal</h1>
-          <p className="text-sm text-slate-500 mt-1">Review existing hawker credentials and apply a new validity period.</p>
+          <h1 className="text-2xl font-bold text-slate-800">Hawker License Renewal (5-Year Extension)</h1>
+          <p className="text-sm text-slate-500 mt-1">Extends validity by exactly 5 years from the current license expiry date.</p>
         </div>
       </div>
 
@@ -203,8 +200,8 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
 
             <div>
               <span className="text-xs text-slate-500 block uppercase tracking-wider">Current Expiry Date</span>
-              <span className="font-medium text-amber-700">
-                {license?.expiryDate ? new Date(license.expiryDate).toLocaleDateString() : 'N/A'}
+              <span className="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block mt-0.5">
+                {currentExpiryFormatted}
               </span>
             </div>
           </div>
@@ -219,15 +216,18 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">
-                New Expiry Date <span className="text-red-500">*</span>
+                New Expiry Date (Enforced +5 Years)
               </label>
               <input
                 type="date"
                 required
-                className="w-full px-3 py-2.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                readOnly
+                className="w-full px-3 py-2.5 border border-slate-300 bg-slate-100 font-semibold text-slate-800 rounded-md shadow-sm cursor-not-allowed sm:text-sm"
                 value={expiryDate}
-                onChange={(e) => setExpiryDate(e.target.value)}
               />
+              <span className="text-xs text-slate-500 block">
+                Calculated strictly as Current Expiry Date ({currentExpiryFormatted}) + 5 Years.
+              </span>
             </div>
 
             <div className="space-y-2">
@@ -283,7 +283,7 @@ export default function RenewLicensePage({ params }: { params: Promise<{ id: str
               disabled={submitting}
               className="px-5 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none transition-colors disabled:opacity-50 w-full sm:w-auto text-center"
             >
-              {submitting ? 'Processing Renewal...' : 'Submit License Renewal'}
+              {submitting ? 'Processing Renewal...' : 'Submit 5-Year License Renewal'}
             </button>
           </div>
         </form>
